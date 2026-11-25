@@ -1,6 +1,6 @@
 # PROJECT STATUS
-current_stage: 1 (Topics) - delivered, waiting for the viewer to pick a number or give their own topic
-active_video: none yet (02-videos/<slug>/ is created at Stage 2)
+current_stage: 2 (Research) - active video umbrella-murder-1978, see its STATUS.md
+active_video: 02-videos/umbrella-murder-1978
 setup: SETUP OK 2026-11-25 | 4 cores, 16 GB, no GPU | bench 0.107 s/frame @1080p (0.056 @540p) | pocketsphinx ok | 1938 basemap fetched | web search ok
 ledger: only _example-ww2 (WW2 start, Poland 1939) already made
 
