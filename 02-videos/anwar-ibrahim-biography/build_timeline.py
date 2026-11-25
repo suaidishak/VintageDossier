@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""Builds timeline.json (seconds) from aligned words. Every event is anchored to a spoken word."""
+import json, sys, os
+V = os.path.dirname(os.path.abspath(__file__))
+W = json.load(open(f'{V}/vo/words.json'))
+def at(word, after=0.0, d=0.0):
+    for w in W:
+        if w['start'] >= after - 1e-6 and w['word'].lower().strip("'") == word.lower():
+            return round(w['start'] + d, 3)
+    raise SystemExit(f'anchor not found: {word} after {after}')
+def end(word, after=0.0):
+    for w in W:
+        if w['start'] >= after - 1e-6 and w['word'].lower() == word.lower(): return w['end']
+    raise SystemExit(word)
+VO_END = W[-1]['end']; DUR = round(VO_END + 1.0, 3)
+ev = {}; sfx = [{"t": 0, "name": "projector", "gain": -27, "loop": True}]
+def ty(i, t, text, cps=22, ding=False): ev[i] = {"kind": "type", "t": t, "text": text, "cps": cps, **({"ding": True} if ding else {})}
+def roll(i, t, t2, a, b): ev[i] = {"kind": "roll", "t": t, "t2": t2, "from": a, "to": b}
+def k(i, kind, t, dur=0.5, **x): ev[i] = {"kind": kind, "t": t, "dur": dur, **x}
+def s(name, t, g): sfx.append({"t": round(t, 3), "name": name, "gain": g})
+
+# ---- chapter boundaries ----
+C2 = at('Then', 50) - 0.15; C3 = at('Then', 87) - 0.15
+ev['C2'] = {"kind": "cut", "t": round(C2, 3)}; ev['C3'] = {"kind": "cut", "t": round(C3, 3)}
+
+# ---- CH1: The Heir ----
+ty('a_month', at('September') + 0.05, 'SEPTEMBER', 16)
+roll('a_year', at('ninety-eight') - 0.9, at('ninety-eight') + 0.05, 1990, 1998); s('stamp', ev['a_year']['t2'], -14)
+k('p01_in', 'drop', at("Malaysia's") - 0.1); s('paper', ev['p01_in']['t'] - 0.05, -15)
+ty('p01_role', at('former'), 'FORMER DEPUTY PM', 26)
+ty('p01_date', at('court'), 'SEPT 1998', 20, True)
+k('p01_circle', 'draw', at('black'), 0.5); s('pen', ev['p01_circle']['t'], -15)
+ty('p01_heir', at('expected'), 'HEIR APPARENT', 24)
+ty('p01_name', at('Anwar', 12), 'ANWAR IBRAHIM', 20, True)
+k('p01_strike', 'draw', at('fall'), 0.3); s('pen', ev['p01_strike']['t'], -15)
+ty('p01_q', at('fall') + 0.37, 'PRISONER?', 18)
+k('glide_map', 'glide', at('born') - 0.7, 0.75); s('whip', ev['glide_map']['t'] - 0.05, -17)
+ty('m_born', at('tenth'), 'BORN 10 AUG 1947', 22, True)
+k('m_penang', 'icon', at('Penang')); s('beep', at('Penang'), -24)
+ty('m_village', at('Penang') + 0.15, 'CHEROK TOK KUN, PENANG', 30)
+k('p02_in', 'drop', at('student') - 0.05); s('paper', ev['p02_in']['t'] - 0.05, -16)
+ty('p02_role', at('led', 20), 'STUDENT LEADER', 24)
+ty('p02_abim', at('youth'), 'MUSLIM YOUTH MOVEMENT', 30)
+ty('m_1974', at('seventy-four'), '1974', 12)
+k('m_route', 'draw', at('he', 26), 0.9)
+k('c1_in', 'drop', at('protesting') - 0.05); s('paper', ev['c1_in']['t'] - 0.05, -16)
+ty('c1_lab', at('rubber'), 'RUBBER TAPPERS GO HUNGRY', 30)
+k('m_baling', 'icon', at('Baling')); s('beep', at('Baling'), -24)
+ty('m_baling_t', at('Baling') + 0.1, 'BALING, KEDAH', 22)
+k('st_detained', 'hit', at('detained')); s('stamp', at('detained'), -11)
+ty('p02_det', at('without', 31), 'NO TRIAL', 20)
+roll('p02_months', at('twenty', 32), at('months') + 0.2, 0, 20)
+k('glide_1982', 'glide', at('Then', 33) + 0.1, 0.7); s('whip', ev['glide_1982']['t'] - 0.05, -16)
+roll('d_1982', at('eighty-two') - 0.6, at('eighty-two') + 0.05, 1974, 1982); s('stamp', ev['d_1982']['t2'], -14)
+k('p03_in', 'drop', at('Mahathir', 36) - 0.1); s('paper', ev['p03_in']['t'] - 0.05, -15)
+ty('p03_name', at('Mahathir', 36), 'DR MAHATHIR MOHAMAD', 26)
+ty('p03_role', at('Mohamad') + 0.3, 'PRIME MINISTER', 24)
+k('p02_move', 'glide', at('invited') - 0.2, 0.7); s('paper', ev['p02_move']['t'], -17)
+k('str_1', 'draw', at('into', 38), 0.4); s('string', at('into', 38), -15)
+ty('p02_umno', at('UMNO'), 'JOINS UMNO', 18, True)
+ty('p02_fin', at('Finance'), 'FINANCE MINISTER 1991', 26)
+ty('p02_dpm', at('Deputy', 44), 'DEPUTY PM 1993', 22, True)
+ty('p02_heir', at('heir'), 'THE HEIR', 18)
+
+# ---- CH2: The Fall ----
+s('flash', C2 - 0.05, -18)
+ty('b_crisis', at('Asian'), 'ASIAN FINANCIAL CRISIS', 28)
+roll('b_1997', at('Asian') + 0.1, at('crisis') + 0.3, 1990, 1997)
+k('b_split', 'draw', at('split'), 0.3); s('pen', at('split'), -15)
+ty('b_date', at('second', 54), '2 SEPT 1998', 18)
+k('st_sacked', 'hit', at('sacked')); s('stamp', at('sacked'), -9)
+k('p04_in', 'drop', at('streets') - 0.1); s('whip', ev['p04_in']['t'] - 0.45, -16); s('paper', ev['p04_in']['t'] - 0.05, -15)
+ty('p04_lab', at('Reformasi'), 'REFORMASI', 16, True)
+k('glide_arrest', 'glide', at('arrested') - 0.6, 0.65); s('whip', ev['glide_arrest']['t'] - 0.05, -17)
+ty('b_arrest', at('arrested'), 'ARRESTED 20 SEPT 1998', 30)
+k('b_circle', 'draw', at('beaten'), 0.5); s('pen', at('beaten'), -15)
+k('c2_in', 'drop', at('Courts') - 0.05); s('paper', ev['c2_in']['t'] - 0.05, -15)
+ty('c2_cor', at('corruption'), 'CORRUPTION  6 YRS', 26)
+ty('c2_sod', at('sodomy', 68), 'SODOMY      9 YRS', 26)
+k('st_guilty', 'hit', at('He', 69) - 0.15); s('stamp', ev['st_guilty']['t'], -11)
+ty('c2_pol', at('political'), 'HIS VIEW: POLITICAL', 30)
+ty('c2_rights', at('rights'), 'RIGHTS GROUPS AGREE', 30)
+roll('c2_2004', at('two', 72), at('four', 73) + 0.05, 1998, 2004)
+k('c2_strike', 'draw', at('overturned'), 0.3); s('pen', at('overturned'), -15)
+ty('c2_over', at('verdict', 76), 'OVERTURNED', 20, True)
+roll('c2_six', at('after', 77), at('years', 78) + 0.15, 0, 6)
+k('glide_2008', 'glide', at('In', 78.5) - 0.1, 0.7); s('whip', ev['glide_2008']['t'] - 0.05, -17)
+ty('m2_2008', at('eight', 79), '2008', 12)
+k('m2_seat', 'icon', at('seat', 80)); s('beep', at('seat', 80), -24)
+ty('m2_pp', at('seat', 80) + 0.1, 'PERMATANG PAUH', 26)
+ty('m2_opp', at('opposition'), 'OPPOSITION LEADER', 28)
+k('c3_in', 'drop', at('fifteen') - 0.05); s('whip', ev['c3_in']['t'] - 0.5, -16); s('paper', ev['c3_in']['t'] - 0.05, -15)
+ty('c3_lab', at('second', 84), 'SODOMY II  5 YRS', 28)
+k('st_prison', 'hit', at('sent', 85)); s('stamp', at('sent', 85), -10)
+
+# ---- CH3: The Return ----
+s('flash', C3 - 0.05, -18)
+ty('d_may', at('May') - 0.05, 'MAY', 10)
+roll('d_2018', at('twenty', 88) - 0.1, at('eighteen', 89) + 0.1, 2015, 2018); s('stamp', ev['d_2018']['t2'], -14)
+ty('d_twist', at('a', 89.9), 'A TWIST', 22)
+k('glide_07', 'glide', at('His', 90) - 0.05, 0.7); s('whip', ev['glide_07']['t'] - 0.05, -17)
+k('p07_in', 'drop', at('coalition') - 0.05); s('paper', ev['p07_in']['t'] - 0.05, -15)
+ty('p07_won', at('won', 92), 'PAKATAN HARAPAN WINS', 30)
+k('p07_circle', 'draw', at('allied'), 0.5); s('pen', at('allied'), -15)
+ty('p07_rival', at('rival'), 'OLD RIVAL, NEW ALLY', 30)
+k('p05_in', 'drop', at('King') - 0.1); s('paper', ev['p05_in']['t'] - 0.05, -15)
+ty('p05_date', at('granted'), '16 MAY 2018', 18)
+k('st_pardon', 'hit', at('full', 97)); s('stamp', at('full', 97), -10)
+k('glide_seats', 'glide', at('Four', 98), 0.7); s('whip', ev['glide_seats']['t'] - 0.05, -17)
+ty('n_lab', at('election', 100), 'SEATS WON  (GE15)', 26)
+roll('n_82', at('election', 100) + 0.1, at('majority') - 0.1, 0, 82)
+ty('n_need', at('party', 101), 'NEEDED: 112', 22, True)
+k('n_under', 'draw', at('majority'), 0.35); s('pen', at('majority'), -16)
+k('glide_pm', 'glide', at('On', 102) - 0.2, 0.6); s('whip', ev['glide_pm']['t'] - 0.05, -17)
+ty('e_day', at('twenty-fourth'), '24 NOVEMBER', 14)
+roll('e_2022', at('twenty', 104) - 0.1, at('twenty-two') + 0.1, 2018, 2022); s('stamp', ev['e_2022']['t2'], -14)
+k('p06_in', 'drop', at('Anwar', 105) - 0.1); s('paper', ev['p06_in']['t'] - 0.05, -14)
+ty('p06_tenth', at('tenth', 108), '10TH PRIME MINISTER', 26, True)
+ty('p06_age', at('seventy-five'), 'AGE', 12)
+roll('p06_75', at('seventy-five'), at('years', 110) + 0.1, 40, 75)
+k('glide_end', 'glide', at('Twenty-four') - 0.35, 0.8); s('whip', ev['glide_end']['t'] - 0.05, -18)
+k('p01b_in', 'drop', at('black', 112) - 0.1); s('paper', ev['p01b_in']['t'] - 0.05, -15)
+ty('f_24', at('Twenty-four'), '24 YEARS', 14)
+k('f_str', 'draw', at('prisoner'), 0.4); s('string', at('prisoner'), -15)
+ty('f_pris', at('prisoner'), 'PRISONER', 16)
+ty('f_pm', at('Prime', 114), 'PRIME MINISTER', 20, True)
+
+T = {"fps": 30, "duration": DUR, "voice_end": VO_END, "ev": ev, "sfx": sorted(sfx, key=lambda x: x['t'])}
+out = sys.argv[1]; json.dump(T, open(out, 'w'), indent=1)
+print('timeline ok', DUR, 's,', len(ev), 'events,', len(sfx), 'sfx; C2', C2, 'C3', C3)

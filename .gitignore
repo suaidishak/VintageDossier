@@ -3,3 +3,7 @@ node_modules/
 01-assets/maps/
 99-exports/*.mp4
 00-setup/SETUP-OK
+02-videos/*/in/
+02-videos/*/vo/*.wav
+99-exports/.chunks_*/
+99-exports/*.mp3

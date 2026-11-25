@@ -1,0 +1,1547 @@
+[
+ {
+  "word": "September",
+  "start": 0.09,
+  "end": 0.5
+ },
+ {
+  "word": "nineteen",
+  "start": 0.5,
+  "end": 1.45
+ },
+ {
+  "word": "ninety-eight",
+  "start": 2.59,
+  "end": 3.92
+ },
+ {
+  "word": "Malaysia's",
+  "start": 3.92,
+  "end": 4.49
+ },
+ {
+  "word": "former",
+  "start": 4.49,
+  "end": 4.86
+ },
+ {
+  "word": "Deputy",
+  "start": 4.86,
+  "end": 5.29
+ },
+ {
+  "word": "Prime",
+  "start": 5.29,
+  "end": 5.59
+ },
+ {
+  "word": "Minister",
+  "start": 5.59,
+  "end": 6.11
+ },
+ {
+  "word": "walks",
+  "start": 6.11,
+  "end": 6.5
+ },
+ {
+  "word": "into",
+  "start": 6.5,
+  "end": 6.66
+ },
+ {
+  "word": "court",
+  "start": 6.66,
+  "end": 7.02
+ },
+ {
+  "word": "with",
+  "start": 7.02,
+  "end": 7.18
+ },
+ {
+  "word": "a",
+  "start": 7.18,
+  "end": 7.23
+ },
+ {
+  "word": "swollen",
+  "start": 7.23,
+  "end": 7.73
+ },
+ {
+  "word": "black",
+  "start": 7.73,
+  "end": 8.02
+ },
+ {
+  "word": "eye",
+  "start": 8.02,
+  "end": 8.29
+ },
+ {
+  "word": "Weeks",
+  "start": 8.65,
+  "end": 8.93
+ },
+ {
+  "word": "earlier",
+  "start": 8.93,
+  "end": 9.5
+ },
+ {
+  "word": "he",
+  "start": 9.58,
+  "end": 9.7
+ },
+ {
+  "word": "was",
+  "start": 9.7,
+  "end": 9.87
+ },
+ {
+  "word": "the",
+  "start": 9.87,
+  "end": 9.96
+ },
+ {
+  "word": "man",
+  "start": 9.96,
+  "end": 10.23
+ },
+ {
+  "word": "expected",
+  "start": 10.23,
+  "end": 10.75
+ },
+ {
+  "word": "to",
+  "start": 10.75,
+  "end": 10.81
+ },
+ {
+  "word": "run",
+  "start": 10.81,
+  "end": 11.01
+ },
+ {
+  "word": "the",
+  "start": 11.01,
+  "end": 11.08
+ },
+ {
+  "word": "country",
+  "start": 11.08,
+  "end": 11.54
+ },
+ {
+  "word": "His",
+  "start": 11.79,
+  "end": 12.0
+ },
+ {
+  "word": "name",
+  "start": 12.0,
+  "end": 12.34
+ },
+ {
+  "word": "is",
+  "start": 12.34,
+  "end": 12.53
+ },
+ {
+  "word": "Anwar",
+  "start": 12.53,
+  "end": 13.03
+ },
+ {
+  "word": "Ibrahim",
+  "start": 13.03,
+  "end": 13.69
+ },
+ {
+  "word": "And",
+  "start": 13.82,
+  "end": 13.98
+ },
+ {
+  "word": "his",
+  "start": 13.98,
+  "end": 14.18
+ },
+ {
+  "word": "fall",
+  "start": 14.18,
+  "end": 14.55
+ },
+ {
+  "word": "was",
+  "start": 14.55,
+  "end": 14.83
+ },
+ {
+  "word": "only",
+  "start": 14.83,
+  "end": 15.14
+ },
+ {
+  "word": "the",
+  "start": 15.14,
+  "end": 15.22
+ },
+ {
+  "word": "beginning",
+  "start": 15.22,
+  "end": 15.74
+ },
+ {
+  "word": "He",
+  "start": 15.91,
+  "end": 16.01
+ },
+ {
+  "word": "was",
+  "start": 16.01,
+  "end": 16.19
+ },
+ {
+  "word": "born",
+  "start": 16.19,
+  "end": 16.49
+ },
+ {
+  "word": "on",
+  "start": 16.49,
+  "end": 16.58
+ },
+ {
+  "word": "the",
+  "start": 16.58,
+  "end": 16.67
+ },
+ {
+  "word": "tenth",
+  "start": 16.67,
+  "end": 16.98
+ },
+ {
+  "word": "of",
+  "start": 16.98,
+  "end": 17.08
+ },
+ {
+  "word": "August",
+  "start": 17.08,
+  "end": 17.5
+ },
+ {
+  "word": "nineteen",
+  "start": 17.5,
+  "end": 17.89
+ },
+ {
+  "word": "forty-seven",
+  "start": 17.89,
+  "end": 18.59
+ },
+ {
+  "word": "in",
+  "start": 18.74,
+  "end": 18.86
+ },
+ {
+  "word": "a",
+  "start": 18.86,
+  "end": 18.92
+ },
+ {
+  "word": "small",
+  "start": 18.92,
+  "end": 19.36
+ },
+ {
+  "word": "village",
+  "start": 19.36,
+  "end": 19.72
+ },
+ {
+  "word": "in",
+  "start": 19.72,
+  "end": 19.83
+ },
+ {
+  "word": "Penang",
+  "start": 19.83,
+  "end": 20.35
+ },
+ {
+  "word": "As",
+  "start": 20.53,
+  "end": 20.73
+ },
+ {
+  "word": "a",
+  "start": 20.73,
+  "end": 20.78
+ },
+ {
+  "word": "student",
+  "start": 20.78,
+  "end": 21.41
+ },
+ {
+  "word": "he",
+  "start": 21.41,
+  "end": 21.65
+ },
+ {
+  "word": "led",
+  "start": 21.65,
+  "end": 21.88
+ },
+ {
+  "word": "Muslim",
+  "start": 21.88,
+  "end": 22.3
+ },
+ {
+  "word": "youth",
+  "start": 22.3,
+  "end": 22.5
+ },
+ {
+  "word": "groups",
+  "start": 22.5,
+  "end": 22.98
+ },
+ {
+  "word": "and",
+  "start": 23.07,
+  "end": 23.18
+ },
+ {
+  "word": "became",
+  "start": 23.18,
+  "end": 23.5
+ },
+ {
+  "word": "a",
+  "start": 23.5,
+  "end": 23.56
+ },
+ {
+  "word": "fierce",
+  "start": 23.56,
+  "end": 24.01
+ },
+ {
+  "word": "voice",
+  "start": 24.01,
+  "end": 24.36
+ },
+ {
+  "word": "for",
+  "start": 24.36,
+  "end": 24.48
+ },
+ {
+  "word": "the",
+  "start": 24.48,
+  "end": 24.56
+ },
+ {
+  "word": "poor",
+  "start": 24.56,
+  "end": 25.02
+ },
+ {
+  "word": "In",
+  "start": 25.21,
+  "end": 25.35
+ },
+ {
+  "word": "nineteen",
+  "start": 25.35,
+  "end": 25.79
+ },
+ {
+  "word": "seventy-four",
+  "start": 25.79,
+  "end": 26.64
+ },
+ {
+  "word": "he",
+  "start": 26.78,
+  "end": 26.88
+ },
+ {
+  "word": "stood",
+  "start": 26.88,
+  "end": 27.19
+ },
+ {
+  "word": "with",
+  "start": 27.19,
+  "end": 27.34
+ },
+ {
+  "word": "students",
+  "start": 27.34,
+  "end": 27.82
+ },
+ {
+  "word": "protesting",
+  "start": 27.82,
+  "end": 28.47
+ },
+ {
+  "word": "hunger",
+  "start": 28.47,
+  "end": 29.03
+ },
+ {
+  "word": "among",
+  "start": 29.03,
+  "end": 29.38
+ },
+ {
+  "word": "rubber",
+  "start": 29.38,
+  "end": 29.65
+ },
+ {
+  "word": "tappers",
+  "start": 29.65,
+  "end": 30.1
+ },
+ {
+  "word": "in",
+  "start": 30.1,
+  "end": 30.22
+ },
+ {
+  "word": "Baling",
+  "start": 30.22,
+  "end": 30.67
+ },
+ {
+  "word": "He",
+  "start": 30.86,
+  "end": 30.97
+ },
+ {
+  "word": "was",
+  "start": 30.97,
+  "end": 31.15
+ },
+ {
+  "word": "detained",
+  "start": 31.15,
+  "end": 31.61
+ },
+ {
+  "word": "without",
+  "start": 31.61,
+  "end": 31.91
+ },
+ {
+  "word": "trial",
+  "start": 31.91,
+  "end": 32.28
+ },
+ {
+  "word": "for",
+  "start": 32.28,
+  "end": 32.41
+ },
+ {
+  "word": "twenty",
+  "start": 32.41,
+  "end": 32.71
+ },
+ {
+  "word": "months",
+  "start": 32.71,
+  "end": 33.15
+ },
+ {
+  "word": "Then",
+  "start": 33.41,
+  "end": 33.99
+ },
+ {
+  "word": "in",
+  "start": 33.99,
+  "end": 34.12
+ },
+ {
+  "word": "nineteen",
+  "start": 34.12,
+  "end": 34.5
+ },
+ {
+  "word": "eighty-two",
+  "start": 34.5,
+  "end": 35.09
+ },
+ {
+  "word": "a",
+  "start": 35.26,
+  "end": 35.33
+ },
+ {
+  "word": "surprise",
+  "start": 35.33,
+  "end": 36.05
+ },
+ {
+  "word": "Prime",
+  "start": 36.2,
+  "end": 36.53
+ },
+ {
+  "word": "Minister",
+  "start": 36.53,
+  "end": 36.98
+ },
+ {
+  "word": "Mahathir",
+  "start": 36.98,
+  "end": 37.55
+ },
+ {
+  "word": "Mohamad",
+  "start": 37.55,
+  "end": 38.26
+ },
+ {
+  "word": "invited",
+  "start": 38.26,
+  "end": 38.75
+ },
+ {
+  "word": "him",
+  "start": 38.75,
+  "end": 38.96
+ },
+ {
+  "word": "into",
+  "start": 38.96,
+  "end": 39.2
+ },
+ {
+  "word": "the",
+  "start": 39.2,
+  "end": 39.27
+ },
+ {
+  "word": "ruling",
+  "start": 39.27,
+  "end": 39.62
+ },
+ {
+  "word": "party",
+  "start": 39.62,
+  "end": 40.04
+ },
+ {
+  "word": "UMNO",
+  "start": 40.18,
+  "end": 40.62
+ },
+ {
+  "word": "Anwar",
+  "start": 40.89,
+  "end": 41.39
+ },
+ {
+  "word": "rose",
+  "start": 41.39,
+  "end": 41.7
+ },
+ {
+  "word": "fast",
+  "start": 41.7,
+  "end": 42.42
+ },
+ {
+  "word": "Finance",
+  "start": 42.42,
+  "end": 42.99
+ },
+ {
+  "word": "Minister",
+  "start": 42.99,
+  "end": 43.48
+ },
+ {
+  "word": "in",
+  "start": 43.48,
+  "end": 43.56
+ },
+ {
+  "word": "nineteen",
+  "start": 43.56,
+  "end": 43.94
+ },
+ {
+  "word": "ninety-one",
+  "start": 43.94,
+  "end": 44.57
+ },
+ {
+  "word": "Deputy",
+  "start": 44.74,
+  "end": 45.2
+ },
+ {
+  "word": "Prime",
+  "start": 45.2,
+  "end": 45.51
+ },
+ {
+  "word": "Minister",
+  "start": 45.51,
+  "end": 46.01
+ },
+ {
+  "word": "in",
+  "start": 46.01,
+  "end": 46.14
+ },
+ {
+  "word": "nineteen",
+  "start": 46.14,
+  "end": 46.54
+ },
+ {
+  "word": "ninety-three",
+  "start": 46.54,
+  "end": 47.2
+ },
+ {
+  "word": "Everyone",
+  "start": 47.44,
+  "end": 47.89
+ },
+ {
+  "word": "saw",
+  "start": 47.89,
+  "end": 48.19
+ },
+ {
+  "word": "him",
+  "start": 48.19,
+  "end": 48.39
+ },
+ {
+  "word": "as",
+  "start": 48.39,
+  "end": 48.54
+ },
+ {
+  "word": "Mahathir's",
+  "start": 48.54,
+  "end": 49.11
+ },
+ {
+  "word": "heir",
+  "start": 49.11,
+  "end": 49.57
+ },
+ {
+  "word": "Then",
+  "start": 51.45,
+  "end": 51.72
+ },
+ {
+  "word": "the",
+  "start": 51.72,
+  "end": 51.89
+ },
+ {
+  "word": "Asian",
+  "start": 51.89,
+  "end": 52.23
+ },
+ {
+  "word": "financial",
+  "start": 52.23,
+  "end": 52.74
+ },
+ {
+  "word": "crisis",
+  "start": 52.74,
+  "end": 53.18
+ },
+ {
+  "word": "hit",
+  "start": 53.18,
+  "end": 53.56
+ },
+ {
+  "word": "and",
+  "start": 53.56,
+  "end": 53.68
+ },
+ {
+  "word": "the",
+  "start": 53.68,
+  "end": 53.76
+ },
+ {
+  "word": "two",
+  "start": 53.76,
+  "end": 53.98
+ },
+ {
+  "word": "men",
+  "start": 53.98,
+  "end": 54.21
+ },
+ {
+  "word": "split",
+  "start": 54.21,
+  "end": 54.74
+ },
+ {
+  "word": "On",
+  "start": 54.74,
+  "end": 55.0
+ },
+ {
+  "word": "the",
+  "start": 55.0,
+  "end": 55.07
+ },
+ {
+  "word": "second",
+  "start": 55.07,
+  "end": 55.47
+ },
+ {
+  "word": "of",
+  "start": 55.47,
+  "end": 55.55
+ },
+ {
+  "word": "September",
+  "start": 55.55,
+  "end": 56.14
+ },
+ {
+  "word": "nineteen",
+  "start": 56.14,
+  "end": 56.59
+ },
+ {
+  "word": "ninety-eight",
+  "start": 56.59,
+  "end": 57.1
+ },
+ {
+  "word": "Mahathir",
+  "start": 57.26,
+  "end": 57.88
+ },
+ {
+  "word": "sacked",
+  "start": 57.88,
+  "end": 58.31
+ },
+ {
+  "word": "him",
+  "start": 58.31,
+  "end": 58.53
+ },
+ {
+  "word": "Anwar",
+  "start": 58.72,
+  "end": 59.16
+ },
+ {
+  "word": "took",
+  "start": 59.16,
+  "end": 59.38
+ },
+ {
+  "word": "his",
+  "start": 59.38,
+  "end": 59.54
+ },
+ {
+  "word": "fight",
+  "start": 59.54,
+  "end": 59.76
+ },
+ {
+  "word": "to",
+  "start": 59.76,
+  "end": 59.87
+ },
+ {
+  "word": "the",
+  "start": 59.87,
+  "end": 59.96
+ },
+ {
+  "word": "streets",
+  "start": 59.96,
+  "end": 60.48
+ },
+ {
+  "word": "The",
+  "start": 60.67,
+  "end": 60.76
+ },
+ {
+  "word": "crowds",
+  "start": 60.76,
+  "end": 61.2
+ },
+ {
+  "word": "called",
+  "start": 61.2,
+  "end": 61.5
+ },
+ {
+  "word": "it",
+  "start": 61.5,
+  "end": 61.7
+ },
+ {
+  "word": "Reformasi",
+  "start": 61.7,
+  "end": 62.61
+ },
+ {
+  "word": "Weeks",
+  "start": 62.83,
+  "end": 63.13
+ },
+ {
+  "word": "later",
+  "start": 63.13,
+  "end": 63.59
+ },
+ {
+  "word": "he",
+  "start": 63.59,
+  "end": 63.71
+ },
+ {
+  "word": "was",
+  "start": 63.71,
+  "end": 63.9
+ },
+ {
+  "word": "arrested",
+  "start": 63.9,
+  "end": 64.52
+ },
+ {
+  "word": "and",
+  "start": 64.52,
+  "end": 64.71
+ },
+ {
+  "word": "beaten",
+  "start": 64.71,
+  "end": 65.08
+ },
+ {
+  "word": "in",
+  "start": 65.08,
+  "end": 65.22
+ },
+ {
+  "word": "police",
+  "start": 65.22,
+  "end": 65.52
+ },
+ {
+  "word": "custody",
+  "start": 65.52,
+  "end": 66.1
+ },
+ {
+  "word": "Courts",
+  "start": 66.29,
+  "end": 66.6
+ },
+ {
+  "word": "convicted",
+  "start": 66.6,
+  "end": 67.18
+ },
+ {
+  "word": "him",
+  "start": 67.18,
+  "end": 67.3
+ },
+ {
+  "word": "of",
+  "start": 67.3,
+  "end": 67.4
+ },
+ {
+  "word": "corruption",
+  "start": 67.4,
+  "end": 68.22
+ },
+ {
+  "word": "then",
+  "start": 68.22,
+  "end": 68.42
+ },
+ {
+  "word": "sodomy",
+  "start": 68.42,
+  "end": 69.0
+ },
+ {
+  "word": "He",
+  "start": 69.19,
+  "end": 69.3
+ },
+ {
+  "word": "called",
+  "start": 69.3,
+  "end": 69.59
+ },
+ {
+  "word": "the",
+  "start": 69.59,
+  "end": 69.67
+ },
+ {
+  "word": "charges",
+  "start": 69.67,
+  "end": 70.13
+ },
+ {
+  "word": "political",
+  "start": 70.13,
+  "end": 70.69
+ },
+ {
+  "word": "So",
+  "start": 70.87,
+  "end": 71.19
+ },
+ {
+  "word": "did",
+  "start": 71.19,
+  "end": 71.33
+ },
+ {
+  "word": "international",
+  "start": 71.33,
+  "end": 71.98
+ },
+ {
+  "word": "rights",
+  "start": 71.98,
+  "end": 72.32
+ },
+ {
+  "word": "groups",
+  "start": 72.32,
+  "end": 72.72
+ },
+ {
+  "word": "In",
+  "start": 72.95,
+  "end": 73.11
+ },
+ {
+  "word": "two",
+  "start": 73.11,
+  "end": 73.31
+ },
+ {
+  "word": "thousand",
+  "start": 73.31,
+  "end": 73.75
+ },
+ {
+  "word": "and",
+  "start": 73.75,
+  "end": 73.84
+ },
+ {
+  "word": "four",
+  "start": 73.84,
+  "end": 74.24
+ },
+ {
+  "word": "the",
+  "start": 74.35,
+  "end": 74.44
+ },
+ {
+  "word": "top",
+  "start": 74.44,
+  "end": 74.81
+ },
+ {
+  "word": "court",
+  "start": 74.81,
+  "end": 75.18
+ },
+ {
+  "word": "overturned",
+  "start": 75.18,
+  "end": 75.78
+ },
+ {
+  "word": "the",
+  "start": 75.78,
+  "end": 75.84
+ },
+ {
+  "word": "sodomy",
+  "start": 75.84,
+  "end": 76.28
+ },
+ {
+  "word": "verdict",
+  "start": 76.28,
+  "end": 76.78
+ },
+ {
+  "word": "and",
+  "start": 76.78,
+  "end": 77.0
+ },
+ {
+  "word": "he",
+  "start": 77.0,
+  "end": 77.09
+ },
+ {
+  "word": "walked",
+  "start": 77.09,
+  "end": 77.46
+ },
+ {
+  "word": "free",
+  "start": 77.46,
+  "end": 77.8
+ },
+ {
+  "word": "after",
+  "start": 77.8,
+  "end": 78.03
+ },
+ {
+  "word": "six",
+  "start": 78.03,
+  "end": 78.34
+ },
+ {
+  "word": "years",
+  "start": 78.34,
+  "end": 78.76
+ },
+ {
+  "word": "In",
+  "start": 78.96,
+  "end": 79.13
+ },
+ {
+  "word": "two",
+  "start": 79.13,
+  "end": 79.34
+ },
+ {
+  "word": "thousand",
+  "start": 79.34,
+  "end": 79.74
+ },
+ {
+  "word": "and",
+  "start": 79.74,
+  "end": 79.83
+ },
+ {
+  "word": "eight",
+  "start": 79.83,
+  "end": 80.08
+ },
+ {
+  "word": "he",
+  "start": 80.08,
+  "end": 80.21
+ },
+ {
+  "word": "won",
+  "start": 80.21,
+  "end": 80.49
+ },
+ {
+  "word": "back",
+  "start": 80.49,
+  "end": 80.7
+ },
+ {
+  "word": "his",
+  "start": 80.7,
+  "end": 80.86
+ },
+ {
+  "word": "old",
+  "start": 80.86,
+  "end": 81.11
+ },
+ {
+  "word": "seat",
+  "start": 81.11,
+  "end": 81.57
+ },
+ {
+  "word": "and",
+  "start": 81.57,
+  "end": 81.73
+ },
+ {
+  "word": "led",
+  "start": 81.73,
+  "end": 81.93
+ },
+ {
+  "word": "the",
+  "start": 81.93,
+  "end": 82.05
+ },
+ {
+  "word": "opposition",
+  "start": 82.05,
+  "end": 82.73
+ },
+ {
+  "word": "But",
+  "start": 82.87,
+  "end": 83.03
+ },
+ {
+  "word": "in",
+  "start": 83.03,
+  "end": 83.14
+ },
+ {
+  "word": "twenty",
+  "start": 83.14,
+  "end": 83.46
+ },
+ {
+  "word": "fifteen",
+  "start": 83.46,
+  "end": 84.21
+ },
+ {
+  "word": "a",
+  "start": 84.32,
+  "end": 84.39
+ },
+ {
+  "word": "second",
+  "start": 84.39,
+  "end": 84.89
+ },
+ {
+  "word": "sodomy",
+  "start": 84.89,
+  "end": 85.34
+ },
+ {
+  "word": "conviction",
+  "start": 85.34,
+  "end": 86.01
+ },
+ {
+  "word": "sent",
+  "start": 86.01,
+  "end": 86.32
+ },
+ {
+  "word": "him",
+  "start": 86.32,
+  "end": 86.48
+ },
+ {
+  "word": "back",
+  "start": 86.48,
+  "end": 86.71
+ },
+ {
+  "word": "to",
+  "start": 86.71,
+  "end": 86.79
+ },
+ {
+  "word": "prison",
+  "start": 86.79,
+  "end": 87.26
+ },
+ {
+  "word": "Then",
+  "start": 87.48,
+  "end": 87.63
+ },
+ {
+  "word": "in",
+  "start": 87.63,
+  "end": 87.96
+ },
+ {
+  "word": "May",
+  "start": 87.96,
+  "end": 88.25
+ },
+ {
+  "word": "twenty",
+  "start": 88.61,
+  "end": 89.11
+ },
+ {
+  "word": "eighteen",
+  "start": 89.35,
+  "end": 90.04
+ },
+ {
+  "word": "a",
+  "start": 90.04,
+  "end": 90.19
+ },
+ {
+  "word": "twist",
+  "start": 90.19,
+  "end": 90.74
+ },
+ {
+  "word": "His",
+  "start": 90.74,
+  "end": 91.07
+ },
+ {
+  "word": "coalition",
+  "start": 91.37,
+  "end": 91.81
+ },
+ {
+  "word": "won",
+  "start": 92.4,
+  "end": 92.74
+ },
+ {
+  "word": "the",
+  "start": 93.16,
+  "end": 93.28
+ },
+ {
+  "word": "election",
+  "start": 93.28,
+  "end": 93.87
+ },
+ {
+  "word": "allied",
+  "start": 93.98,
+  "end": 94.42
+ },
+ {
+  "word": "with",
+  "start": 94.42,
+  "end": 94.57
+ },
+ {
+  "word": "his",
+  "start": 94.57,
+  "end": 94.72
+ },
+ {
+  "word": "old",
+  "start": 94.72,
+  "end": 95.02
+ },
+ {
+  "word": "rival",
+  "start": 95.02,
+  "end": 95.55
+ },
+ {
+  "word": "Mahathir",
+  "start": 95.55,
+  "end": 96.26
+ },
+ {
+  "word": "The",
+  "start": 96.47,
+  "end": 96.55
+ },
+ {
+  "word": "King",
+  "start": 96.55,
+  "end": 96.91
+ },
+ {
+  "word": "granted",
+  "start": 96.91,
+  "end": 97.3
+ },
+ {
+  "word": "Anwar",
+  "start": 97.3,
+  "end": 97.88
+ },
+ {
+  "word": "a",
+  "start": 97.88,
+  "end": 97.95
+ },
+ {
+  "word": "full",
+  "start": 97.95,
+  "end": 98.24
+ },
+ {
+  "word": "pardon",
+  "start": 98.24,
+  "end": 98.74
+ },
+ {
+  "word": "Four",
+  "start": 98.92,
+  "end": 99.2
+ },
+ {
+  "word": "years",
+  "start": 99.2,
+  "end": 99.5
+ },
+ {
+  "word": "later",
+  "start": 99.5,
+  "end": 99.98
+ },
+ {
+  "word": "a",
+  "start": 100.12,
+  "end": 100.19
+ },
+ {
+  "word": "new",
+  "start": 100.19,
+  "end": 100.43
+ },
+ {
+  "word": "election",
+  "start": 100.43,
+  "end": 100.89
+ },
+ {
+  "word": "left",
+  "start": 100.89,
+  "end": 101.15
+ },
+ {
+  "word": "no",
+  "start": 101.15,
+  "end": 101.41
+ },
+ {
+  "word": "party",
+  "start": 101.41,
+  "end": 101.73
+ },
+ {
+  "word": "with",
+  "start": 101.73,
+  "end": 101.9
+ },
+ {
+  "word": "a",
+  "start": 101.9,
+  "end": 101.93
+ },
+ {
+  "word": "majority",
+  "start": 101.93,
+  "end": 102.53
+ },
+ {
+  "word": "On",
+  "start": 102.7,
+  "end": 102.83
+ },
+ {
+  "word": "the",
+  "start": 102.83,
+  "end": 102.91
+ },
+ {
+  "word": "twenty-fourth",
+  "start": 102.91,
+  "end": 103.62
+ },
+ {
+  "word": "of",
+  "start": 103.62,
+  "end": 103.71
+ },
+ {
+  "word": "November",
+  "start": 103.71,
+  "end": 104.27
+ },
+ {
+  "word": "twenty",
+  "start": 104.27,
+  "end": 104.6
+ },
+ {
+  "word": "twenty-two",
+  "start": 104.6,
+  "end": 105.27
+ },
+ {
+  "word": "Anwar",
+  "start": 105.49,
+  "end": 105.96
+ },
+ {
+  "word": "Ibrahim",
+  "start": 105.96,
+  "end": 106.58
+ },
+ {
+  "word": "was",
+  "start": 106.58,
+  "end": 106.71
+ },
+ {
+  "word": "sworn",
+  "start": 106.71,
+  "end": 107.12
+ },
+ {
+  "word": "in",
+  "start": 107.12,
+  "end": 107.4
+ },
+ {
+  "word": "as",
+  "start": 107.4,
+  "end": 107.62
+ },
+ {
+  "word": "Malaysia's",
+  "start": 107.62,
+  "end": 108.21
+ },
+ {
+  "word": "tenth",
+  "start": 108.21,
+  "end": 108.55
+ },
+ {
+  "word": "Prime",
+  "start": 108.55,
+  "end": 108.83
+ },
+ {
+  "word": "Minister",
+  "start": 108.83,
+  "end": 109.33
+ },
+ {
+  "word": "He",
+  "start": 109.49,
+  "end": 109.61
+ },
+ {
+  "word": "was",
+  "start": 109.61,
+  "end": 109.78
+ },
+ {
+  "word": "seventy-five",
+  "start": 109.78,
+  "end": 110.56
+ },
+ {
+  "word": "years",
+  "start": 110.56,
+  "end": 110.8
+ },
+ {
+  "word": "old",
+  "start": 110.8,
+  "end": 111.31
+ },
+ {
+  "word": "Twenty-four",
+  "start": 111.31,
+  "end": 111.91
+ },
+ {
+  "word": "years",
+  "start": 111.91,
+  "end": 112.29
+ },
+ {
+  "word": "after",
+  "start": 112.29,
+  "end": 112.5
+ },
+ {
+  "word": "the",
+  "start": 112.5,
+  "end": 112.6
+ },
+ {
+  "word": "black",
+  "start": 112.6,
+  "end": 112.92
+ },
+ {
+  "word": "eye",
+  "start": 112.92,
+  "end": 113.28
+ },
+ {
+  "word": "the",
+  "start": 113.41,
+  "end": 113.5
+ },
+ {
+  "word": "prisoner",
+  "start": 113.5,
+  "end": 114.14
+ },
+ {
+  "word": "had",
+  "start": 114.14,
+  "end": 114.34
+ },
+ {
+  "word": "become",
+  "start": 114.34,
+  "end": 114.72
+ },
+ {
+  "word": "the",
+  "start": 114.72,
+  "end": 114.79
+ },
+ {
+  "word": "Prime",
+  "start": 114.79,
+  "end": 115.12
+ },
+ {
+  "word": "Minister",
+  "start": 115.12,
+  "end": 115.65
+ }
+]

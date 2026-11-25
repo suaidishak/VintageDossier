@@ -6,8 +6,8 @@ Choose lon0/lon1/lat-top so the story region sits in the middle with margin (cam
 import json, math, argparse
 ap = argparse.ArgumentParser(); ap.add_argument('src'); ap.add_argument('out')
 ap.add_argument('--lon0', type=float, required=True); ap.add_argument('--lon1', type=float, required=True); ap.add_argument('--lat-top', type=float, required=True)
-ap.add_argument('--lat-c', type=float, default=None); ap.add_argument('--w', type=int, default=3840)
-a = ap.parse_args(); W = a.w; H = round(W * 9 / 16)
+ap.add_argument('--lat-c', type=float, default=None); ap.add_argument('--w', type=int, default=3840); ap.add_argument('--h', type=int, default=0)
+a = ap.parse_args(); W = a.w; H = a.h or round(W * 9 / 16)
 latc = a.lat_c if a.lat_c is not None else a.lat_top - (a.lon1 - a.lon0) * 0.3
 c = math.cos(math.radians(latc)); k = W / ((a.lon1 - a.lon0) * c); latBot = a.lat_top - H / k
 P = lambda lon, lat: (round((lon - a.lon0) * c * k, 1), round((a.lat_top - lat) * k, 1))

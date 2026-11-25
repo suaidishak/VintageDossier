@@ -1,0 +1,794 @@
+{
+ "fps": 30,
+ "duration": 116.65,
+ "voice_end": 115.65,
+ "ev": {
+  "C2": {
+   "kind": "cut",
+   "t": 51.3
+  },
+  "C3": {
+   "kind": "cut",
+   "t": 87.33
+  },
+  "a_month": {
+   "kind": "type",
+   "t": 0.14,
+   "text": "SEPTEMBER",
+   "cps": 16
+  },
+  "a_year": {
+   "kind": "roll",
+   "t": 1.69,
+   "t2": 2.6399999999999997,
+   "from": 1990,
+   "to": 1998
+  },
+  "p01_in": {
+   "kind": "drop",
+   "t": 3.82,
+   "dur": 0.5
+  },
+  "p01_role": {
+   "kind": "type",
+   "t": 4.49,
+   "text": "FORMER DEPUTY PM",
+   "cps": 26
+  },
+  "p01_date": {
+   "kind": "type",
+   "t": 6.66,
+   "text": "SEPT 1998",
+   "cps": 20,
+   "ding": true
+  },
+  "p01_circle": {
+   "kind": "draw",
+   "t": 7.73,
+   "dur": 0.5
+  },
+  "p01_heir": {
+   "kind": "type",
+   "t": 10.23,
+   "text": "HEIR APPARENT",
+   "cps": 24
+  },
+  "p01_name": {
+   "kind": "type",
+   "t": 12.53,
+   "text": "ANWAR IBRAHIM",
+   "cps": 20,
+   "ding": true
+  },
+  "p01_strike": {
+   "kind": "draw",
+   "t": 14.18,
+   "dur": 0.3
+  },
+  "p01_q": {
+   "kind": "type",
+   "t": 14.549999999999999,
+   "text": "PRISONER?",
+   "cps": 18
+  },
+  "glide_map": {
+   "kind": "glide",
+   "t": 15.490000000000002,
+   "dur": 0.75
+  },
+  "m_born": {
+   "kind": "type",
+   "t": 16.67,
+   "text": "BORN 10 AUG 1947",
+   "cps": 22,
+   "ding": true
+  },
+  "m_penang": {
+   "kind": "icon",
+   "t": 19.83,
+   "dur": 0.5
+  },
+  "m_village": {
+   "kind": "type",
+   "t": 19.979999999999997,
+   "text": "CHEROK TOK KUN, PENANG",
+   "cps": 30
+  },
+  "p02_in": {
+   "kind": "drop",
+   "t": 20.73,
+   "dur": 0.5
+  },
+  "p02_role": {
+   "kind": "type",
+   "t": 21.65,
+   "text": "STUDENT LEADER",
+   "cps": 24
+  },
+  "p02_abim": {
+   "kind": "type",
+   "t": 22.3,
+   "text": "MUSLIM YOUTH MOVEMENT",
+   "cps": 30
+  },
+  "m_1974": {
+   "kind": "type",
+   "t": 25.79,
+   "text": "1974",
+   "cps": 12
+  },
+  "m_route": {
+   "kind": "draw",
+   "t": 26.78,
+   "dur": 0.9
+  },
+  "c1_in": {
+   "kind": "drop",
+   "t": 27.77,
+   "dur": 0.5
+  },
+  "c1_lab": {
+   "kind": "type",
+   "t": 29.38,
+   "text": "RUBBER TAPPERS GO HUNGRY",
+   "cps": 30
+  },
+  "m_baling": {
+   "kind": "icon",
+   "t": 30.22,
+   "dur": 0.5
+  },
+  "m_baling_t": {
+   "kind": "type",
+   "t": 30.32,
+   "text": "BALING, KEDAH",
+   "cps": 22
+  },
+  "st_detained": {
+   "kind": "hit",
+   "t": 31.15,
+   "dur": 0.5
+  },
+  "p02_det": {
+   "kind": "type",
+   "t": 31.61,
+   "text": "NO TRIAL",
+   "cps": 20
+  },
+  "p02_months": {
+   "kind": "roll",
+   "t": 32.41,
+   "t2": 32.910000000000004,
+   "from": 0,
+   "to": 20
+  },
+  "glide_1982": {
+   "kind": "glide",
+   "t": 33.51,
+   "dur": 0.7
+  },
+  "d_1982": {
+   "kind": "roll",
+   "t": 33.9,
+   "t2": 34.55,
+   "from": 1974,
+   "to": 1982
+  },
+  "p03_in": {
+   "kind": "drop",
+   "t": 36.879999999999995,
+   "dur": 0.5
+  },
+  "p03_name": {
+   "kind": "type",
+   "t": 36.98,
+   "text": "DR MAHATHIR MOHAMAD",
+   "cps": 26
+  },
+  "p03_role": {
+   "kind": "type",
+   "t": 37.849999999999994,
+   "text": "PRIME MINISTER",
+   "cps": 24
+  },
+  "p02_move": {
+   "kind": "glide",
+   "t": 38.059999999999995,
+   "dur": 0.7
+  },
+  "str_1": {
+   "kind": "draw",
+   "t": 38.96,
+   "dur": 0.4
+  },
+  "p02_umno": {
+   "kind": "type",
+   "t": 40.18,
+   "text": "JOINS UMNO",
+   "cps": 18,
+   "ding": true
+  },
+  "p02_fin": {
+   "kind": "type",
+   "t": 42.42,
+   "text": "FINANCE MINISTER 1991",
+   "cps": 26
+  },
+  "p02_dpm": {
+   "kind": "type",
+   "t": 44.74,
+   "text": "DEPUTY PM 1993",
+   "cps": 22,
+   "ding": true
+  },
+  "p02_heir": {
+   "kind": "type",
+   "t": 49.11,
+   "text": "THE HEIR",
+   "cps": 18
+  },
+  "b_crisis": {
+   "kind": "type",
+   "t": 51.89,
+   "text": "ASIAN FINANCIAL CRISIS",
+   "cps": 28
+  },
+  "b_1997": {
+   "kind": "roll",
+   "t": 51.99,
+   "t2": 53.04,
+   "from": 1990,
+   "to": 1997
+  },
+  "b_split": {
+   "kind": "draw",
+   "t": 54.21,
+   "dur": 0.3
+  },
+  "b_date": {
+   "kind": "type",
+   "t": 55.07,
+   "text": "2 SEPT 1998",
+   "cps": 18
+  },
+  "st_sacked": {
+   "kind": "hit",
+   "t": 57.88,
+   "dur": 0.5
+  },
+  "p04_in": {
+   "kind": "drop",
+   "t": 59.86,
+   "dur": 0.5
+  },
+  "p04_lab": {
+   "kind": "type",
+   "t": 61.7,
+   "text": "REFORMASI",
+   "cps": 16,
+   "ding": true
+  },
+  "glide_arrest": {
+   "kind": "glide",
+   "t": 63.3,
+   "dur": 0.65
+  },
+  "b_arrest": {
+   "kind": "type",
+   "t": 63.9,
+   "text": "ARRESTED 20 SEPT 1998",
+   "cps": 30
+  },
+  "b_circle": {
+   "kind": "draw",
+   "t": 64.71,
+   "dur": 0.5
+  },
+  "c2_in": {
+   "kind": "drop",
+   "t": 66.24000000000001,
+   "dur": 0.5
+  },
+  "c2_cor": {
+   "kind": "type",
+   "t": 67.4,
+   "text": "CORRUPTION  6 YRS",
+   "cps": 26
+  },
+  "c2_sod": {
+   "kind": "type",
+   "t": 68.42,
+   "text": "SODOMY      9 YRS",
+   "cps": 26
+  },
+  "st_guilty": {
+   "kind": "hit",
+   "t": 69.03999999999999,
+   "dur": 0.5
+  },
+  "c2_pol": {
+   "kind": "type",
+   "t": 70.13,
+   "text": "HIS VIEW: POLITICAL",
+   "cps": 30
+  },
+  "c2_rights": {
+   "kind": "type",
+   "t": 71.98,
+   "text": "RIGHTS GROUPS AGREE",
+   "cps": 30
+  },
+  "c2_2004": {
+   "kind": "roll",
+   "t": 73.11,
+   "t2": 73.89,
+   "from": 1998,
+   "to": 2004
+  },
+  "c2_strike": {
+   "kind": "draw",
+   "t": 75.18,
+   "dur": 0.3
+  },
+  "c2_over": {
+   "kind": "type",
+   "t": 76.28,
+   "text": "OVERTURNED",
+   "cps": 20,
+   "ding": true
+  },
+  "c2_six": {
+   "kind": "roll",
+   "t": 77.8,
+   "t2": 78.49000000000001,
+   "from": 0,
+   "to": 6
+  },
+  "glide_2008": {
+   "kind": "glide",
+   "t": 78.86,
+   "dur": 0.7
+  },
+  "m2_2008": {
+   "kind": "type",
+   "t": 79.83,
+   "text": "2008",
+   "cps": 12
+  },
+  "m2_seat": {
+   "kind": "icon",
+   "t": 81.11,
+   "dur": 0.5
+  },
+  "m2_pp": {
+   "kind": "type",
+   "t": 81.21,
+   "text": "PERMATANG PAUH",
+   "cps": 26
+  },
+  "m2_opp": {
+   "kind": "type",
+   "t": 82.05,
+   "text": "OPPOSITION LEADER",
+   "cps": 28
+  },
+  "c3_in": {
+   "kind": "drop",
+   "t": 83.41,
+   "dur": 0.5
+  },
+  "c3_lab": {
+   "kind": "type",
+   "t": 84.39,
+   "text": "SODOMY II  5 YRS",
+   "cps": 28
+  },
+  "st_prison": {
+   "kind": "hit",
+   "t": 86.01,
+   "dur": 0.5
+  },
+  "d_may": {
+   "kind": "type",
+   "t": 87.91,
+   "text": "MAY",
+   "cps": 10
+  },
+  "d_2018": {
+   "kind": "roll",
+   "t": 88.51,
+   "t2": 89.44999999999999,
+   "from": 2015,
+   "to": 2018
+  },
+  "d_twist": {
+   "kind": "type",
+   "t": 90.04,
+   "text": "A TWIST",
+   "cps": 22
+  },
+  "glide_07": {
+   "kind": "glide",
+   "t": 90.69,
+   "dur": 0.7
+  },
+  "p07_in": {
+   "kind": "drop",
+   "t": 91.32000000000001,
+   "dur": 0.5
+  },
+  "p07_won": {
+   "kind": "type",
+   "t": 92.4,
+   "text": "PAKATAN HARAPAN WINS",
+   "cps": 30
+  },
+  "p07_circle": {
+   "kind": "draw",
+   "t": 93.98,
+   "dur": 0.5
+  },
+  "p07_rival": {
+   "kind": "type",
+   "t": 95.02,
+   "text": "OLD RIVAL, NEW ALLY",
+   "cps": 30
+  },
+  "p05_in": {
+   "kind": "drop",
+   "t": 96.45,
+   "dur": 0.5
+  },
+  "p05_date": {
+   "kind": "type",
+   "t": 96.91,
+   "text": "16 MAY 2018",
+   "cps": 18
+  },
+  "st_pardon": {
+   "kind": "hit",
+   "t": 97.95,
+   "dur": 0.5
+  },
+  "glide_seats": {
+   "kind": "glide",
+   "t": 98.92,
+   "dur": 0.7
+  },
+  "n_lab": {
+   "kind": "type",
+   "t": 100.43,
+   "text": "SEATS WON  (GE15)",
+   "cps": 26
+  },
+  "n_82": {
+   "kind": "roll",
+   "t": 100.53,
+   "t2": 101.83000000000001,
+   "from": 0,
+   "to": 82
+  },
+  "n_need": {
+   "kind": "type",
+   "t": 101.41,
+   "text": "NEEDED: 112",
+   "cps": 22,
+   "ding": true
+  },
+  "n_under": {
+   "kind": "draw",
+   "t": 101.93,
+   "dur": 0.35
+  },
+  "glide_pm": {
+   "kind": "glide",
+   "t": 102.5,
+   "dur": 0.6
+  },
+  "e_day": {
+   "kind": "type",
+   "t": 102.91,
+   "text": "24 NOVEMBER",
+   "cps": 14
+  },
+  "e_2022": {
+   "kind": "roll",
+   "t": 104.17,
+   "t2": 104.69999999999999,
+   "from": 2018,
+   "to": 2022
+  },
+  "p06_in": {
+   "kind": "drop",
+   "t": 105.39,
+   "dur": 0.5
+  },
+  "p06_tenth": {
+   "kind": "type",
+   "t": 108.21,
+   "text": "10TH PRIME MINISTER",
+   "cps": 26,
+   "ding": true
+  },
+  "p06_age": {
+   "kind": "type",
+   "t": 109.78,
+   "text": "AGE",
+   "cps": 12
+  },
+  "p06_75": {
+   "kind": "roll",
+   "t": 109.78,
+   "t2": 110.66,
+   "from": 40,
+   "to": 75
+  },
+  "glide_end": {
+   "kind": "glide",
+   "t": 110.96000000000001,
+   "dur": 0.8
+  },
+  "p01b_in": {
+   "kind": "drop",
+   "t": 112.5,
+   "dur": 0.5
+  },
+  "f_24": {
+   "kind": "type",
+   "t": 111.31,
+   "text": "24 YEARS",
+   "cps": 14
+  },
+  "f_str": {
+   "kind": "draw",
+   "t": 113.5,
+   "dur": 0.4
+  },
+  "f_pris": {
+   "kind": "type",
+   "t": 113.5,
+   "text": "PRISONER",
+   "cps": 16
+  },
+  "f_pm": {
+   "kind": "type",
+   "t": 114.79,
+   "text": "PRIME MINISTER",
+   "cps": 20,
+   "ding": true
+  }
+ },
+ "sfx": [
+  {
+   "t": 0,
+   "name": "projector",
+   "gain": -27,
+   "loop": true
+  },
+  {
+   "t": 2.64,
+   "name": "stamp",
+   "gain": -14
+  },
+  {
+   "t": 3.77,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 7.73,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 14.18,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 15.44,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 19.83,
+   "name": "beep",
+   "gain": -24
+  },
+  {
+   "t": 20.68,
+   "name": "paper",
+   "gain": -16
+  },
+  {
+   "t": 27.72,
+   "name": "paper",
+   "gain": -16
+  },
+  {
+   "t": 30.22,
+   "name": "beep",
+   "gain": -24
+  },
+  {
+   "t": 31.15,
+   "name": "stamp",
+   "gain": -11
+  },
+  {
+   "t": 33.46,
+   "name": "whip",
+   "gain": -16
+  },
+  {
+   "t": 34.55,
+   "name": "stamp",
+   "gain": -14
+  },
+  {
+   "t": 36.83,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 38.06,
+   "name": "paper",
+   "gain": -17
+  },
+  {
+   "t": 38.96,
+   "name": "string",
+   "gain": -15
+  },
+  {
+   "t": 51.25,
+   "name": "flash",
+   "gain": -18
+  },
+  {
+   "t": 54.21,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 57.88,
+   "name": "stamp",
+   "gain": -9
+  },
+  {
+   "t": 59.41,
+   "name": "whip",
+   "gain": -16
+  },
+  {
+   "t": 59.81,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 63.25,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 64.71,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 66.19,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 69.04,
+   "name": "stamp",
+   "gain": -11
+  },
+  {
+   "t": 75.18,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 78.81,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 81.11,
+   "name": "beep",
+   "gain": -24
+  },
+  {
+   "t": 82.91,
+   "name": "whip",
+   "gain": -16
+  },
+  {
+   "t": 83.36,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 86.01,
+   "name": "stamp",
+   "gain": -10
+  },
+  {
+   "t": 87.28,
+   "name": "flash",
+   "gain": -18
+  },
+  {
+   "t": 89.45,
+   "name": "stamp",
+   "gain": -14
+  },
+  {
+   "t": 90.64,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 91.27,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 93.98,
+   "name": "pen",
+   "gain": -15
+  },
+  {
+   "t": 96.4,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 97.95,
+   "name": "stamp",
+   "gain": -10
+  },
+  {
+   "t": 98.87,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 101.93,
+   "name": "pen",
+   "gain": -16
+  },
+  {
+   "t": 102.45,
+   "name": "whip",
+   "gain": -17
+  },
+  {
+   "t": 104.7,
+   "name": "stamp",
+   "gain": -14
+  },
+  {
+   "t": 105.34,
+   "name": "paper",
+   "gain": -14
+  },
+  {
+   "t": 110.91,
+   "name": "whip",
+   "gain": -18
+  },
+  {
+   "t": 112.45,
+   "name": "paper",
+   "gain": -15
+  },
+  {
+   "t": 113.5,
+   "name": "string",
+   "gain": -15
+  }
+ ]
+}

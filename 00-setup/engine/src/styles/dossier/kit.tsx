@@ -21,17 +21,17 @@ export const Desk: React.FC<{ drift?: number }> = ({ drift = 0 }) => {
 
 // ---------- film layer: grain, vignette, flicker, weave, dust ----------
 export const FilmLayer: React.FC<{ vignette?: number }> = ({ vignette = 0.85 }) => {
-  const { f } = useSec();
+  const { f } = useSec(); const { width: VW, height: VH } = useVideoConfig();
   const flick = 1 + (random(`fl${f}`) - 0.5) * 0.05;
-  const dust = Array.from({ length: 3 }, (_, i) => ({ on: random(`d${f}${i}`) > 0.72, x: random(`dx${f}${i}`) * 1920, y: random(`dy${f}${i}`) * 1080, r: 1 + random(`dr${f}${i}`) * 2.5 }));
-  const scratch = random(`sc${Math.floor(f / 3)}`) > 0.86 ? random(`sx${Math.floor(f / 3)}`) * 1920 : -10;
+  const dust = Array.from({ length: 3 }, (_, i) => ({ on: random(`d${f}${i}`) > 0.72, x: random(`dx${f}${i}`) * VW, y: random(`dy${f}${i}`) * VH, r: 1 + random(`dr${f}${i}`) * 2.5 }));
+  const scratch = random(`sc${Math.floor(f / 3)}`) > 0.86 ? random(`sx${Math.floor(f / 3)}`) * VW : -10;
   return <AbsoluteFill style={{ pointerEvents: "none" }}>
     <AbsoluteFill style={{ background: `radial-gradient(ellipse 72% 68% at 50% 48%, rgba(0,0,0,0) 35%, rgba(0,0,0,${vignette}) 100%)` }} />
     <Img src={staticFile(`grain${f % 4}.png`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", mixBlendMode: "overlay", opacity: 0.22 }} />
     <AbsoluteFill style={{ background: `rgba(255,236,200,${(flick - 1) * 0.6 + 0.012})` }} />
-    <svg width={1920} height={1080} style={{ position: "absolute" }}>
+    <svg width={VW} height={VH} style={{ position: "absolute" }}>
       {dust.map((d, i) => d.on ? <circle key={i} cx={d.x} cy={d.y} r={d.r} fill="rgba(235,225,200,0.35)" /> : null)}
-      <line x1={scratch} y1={0} x2={scratch + 4} y2={1080} stroke="rgba(230,220,195,0.10)" strokeWidth={1.5} />
+      <line x1={scratch} y1={0} x2={scratch + 4} y2={VH} stroke="rgba(230,220,195,0.10)" strokeWidth={1.5} />
     </svg>
   </AbsoluteFill>;
 };
@@ -159,12 +159,12 @@ export const kf = (keys: K[], s: number, p: "x" | "y" | "s" | "r" | "z", def = 0
 };
 /** world camera: keys in world px, z = screen px per world px; adds speed-based motion blur */
 export const WorldCam: React.FC<{ keys: K[]; children: React.ReactNode; maxBlur?: number }> = ({ keys, children, maxBlur = 4 }) => {
-  const { s, fps } = useSec(); const d = 1 / fps;
+  const { s, fps } = useSec(); const d = 1 / fps; const { width: VW, height: VH } = useVideoConfig();
   const x = kf(keys, s, "x"), y = kf(keys, s, "y"), z = kf(keys, s, "z", 1), r = kf(keys, s, "r");
   const vx = (x - kf(keys, s - d, "x")) * z, vy = (y - kf(keys, s - d, "y")) * z, vz = Math.abs(z - kf(keys, s - d, "z", 1)) * 1200;
   const blur = Math.min(maxBlur, Math.hypot(vx, vy, vz) / 30);
   return <AbsoluteFill style={{ overflow: "hidden" }}>
-    <div style={{ position: "absolute", left: 0, top: 0, transformOrigin: "0 0", transform: `translate(960px,540px) rotate(${r}deg) scale(${z}) translate(${-x}px, ${-y}px)`, filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined }}>{children}</div>
+    <div style={{ position: "absolute", left: 0, top: 0, transformOrigin: "0 0", transform: `translate(${VW / 2}px,${VH / 2}px) rotate(${r}deg) scale(${z}) translate(${-x}px, ${-y}px)`, filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined }}>{children}</div>
   </AbsoluteFill>;
 };
 /** desk surface covering the whole world */
