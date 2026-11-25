@@ -1,0 +1,5 @@
+node_modules/
+00-setup/engine/public/
+01-assets/maps/
+99-exports/*.mp4
+00-setup/SETUP-OK
