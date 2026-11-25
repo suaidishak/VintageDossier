@@ -1,5 +1,5 @@
 # PROJECT STATUS
-current_stage: 4 (Script) - active video anwar-ibrahim-biography (9:16, 2 min)
+current_stage: 5 (Assets) - active video anwar-ibrahim-biography (9:16, 2 min)
 active_video: 02-videos/anwar-ibrahim-biography
 setup: SETUP OK 2026-11-25 | 4 cores, 16 GB, no GPU | bench 0.107 s/frame @1080p (0.056 @540p) | pocketsphinx ok | 1938 basemap fetched | web search ok
 ledger: only _example-ww2 (WW2 start, Poland 1939) already made
