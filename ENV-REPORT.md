@@ -1,9 +1,9 @@
-# ENV REPORT (2026-11-25T00:34:48Z)
+# ENV REPORT (2026-11-26T13:45:22Z)
 ## System
 cores: 4
-Mem:           16087         673       14538          12        1120       15414
-/dev/vda        252G  9.4G   60G  14% /
-Linux 6.18.44-fc-v819
+Mem:           16087         582       15044          12         692       15504
+/dev/vda        252G  9.1G   60G  14% /
+Linux 6.18.44-fc-v880
 ## GPU
 no NVIDIA GPU detected -> assume CPU-only rendering
 ## Tools
@@ -35,4 +35,4 @@ huggingface.co -> 000
 /opt/pw-browsers/ffmpeg-1011
 /opt/pw-browsers/headless_shell_as_downloaded
 /opt/pw-browsers/network-process-on-tmp.sh
-render_s_per_frame=0.1
+render_s_per_frame=0.017
