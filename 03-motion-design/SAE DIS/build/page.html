@@ -463,7 +463,8 @@ let built = false;
 function render(t) {
   if (!built) { build(); built = true; }
   const still = t >= 29.0;   // the end card holds perfectly still: no blur needed
-  const n = still ? 1 : SUB, A = ACC.getContext('2d'); A.setTransform(1, 0, 0, 1, 0, 0); A.globalAlpha = 1; A.clearRect(0, 0, ACC.width, ACC.height);
+  const fast = [[0, 3.4], [10.0, 12.6], [14.6, 16.4], [19.8, 24.2], [26.3, 28.2]].some(([x, y]) => t >= x && t <= y);   // full motion blur on fast moves only
+  const n = still ? 1 : (q.has('sub') ? SUB : fast ? 12 : 6), A = ACC.getContext('2d'); A.setTransform(1, 0, 0, 1, 0, 0); A.globalAlpha = 1; A.clearRect(0, 0, ACC.width, ACC.height);
   for (let i = 0; i < n; i++) { const ts = n === 1 ? t : Math.max(0, Math.min(END, t + (i / (n - 1) - 0.5) * SHUTTER)); const g = TMP.getContext('2d'); frame(g, ts);
     A.globalAlpha = 1 / (i + 1); A.drawImage(TMP, 0, 0); }
   MAIN.setTransform(1, 0, 0, 1, 0, 0); MAIN.globalAlpha = 1; MAIN.drawImage(ACC, 0, 0);
