@@ -1,5 +1,5 @@
 # Motion Design status
-step: 3 Ending - assets accepted as-is (brochure images in assets/brochure, git-ignored; re-extract from the uploaded brochure if missing). Waiting for CTA pick
+step: 4 Storyboard shown (ending A: logo + sae-malaysia.com + "Talk to us about your DIS application.") - waiting for approval/notes. 8 shots, see SAE DIS/storyboard/storyboard.html (frames.html renders key frames)
 env: Node 22, Python 3 + Pillow/numpy/scipy/opencv, ffmpeg 6.1, Chrome 158 (headless). No GPU: 3D renders via
      software WebGL, run with CHROME=motion-design/scripts/chrome-cloud.sh (template test render OK).
 brand: SAE DIS (Distribution Interface Switch) - project folder "SAE DIS/". Brochure kept out of git (uploaded file).

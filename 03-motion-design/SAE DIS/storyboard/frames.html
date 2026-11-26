@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SAE DIS storyboard frames</title>
+<style>
+  /* Rough key frames for the storyboard: real logo + brochure HMI, layout only, no motion. */
+  * { box-sizing: border-box; }
+  :root { --navy: #0B1F3A; --deep: #060D1A; --blue: #114B9B; --sig: #3D8BFF; --ok: #2BD47D; --ink: #F2F5FA; --mute: #8FA3C0; }
+  html, body { margin: 0; background: #000; font-family: Inter, system-ui, sans-serif; color: var(--ink); }
+  .f { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: radial-gradient(ellipse at 50% 45%, #10284A 0%, var(--deep) 70%); }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(90,140,220,.07) 3px, transparent 3px), linear-gradient(90deg, rgba(90,140,220,.07) 3px, transparent 3px); background-size: 120px 120px; transform: perspective(900px) rotateX(58deg) translateY(330px) scale(2.2); transform-origin: 50% 100%; }
+  .line { position: absolute; font-weight: 600; font-size: 64px; letter-spacing: -2px; left: 0; right: 0; text-align: center; }
+  .line .dim { opacity: .35; filter: blur(5px); }
+  .stripe { position: absolute; height: 34px; background: var(--blue); }
+  svg { position: absolute; overflow: visible; }
+  .panel { position: absolute; border-radius: 22px; background: #12161D; box-shadow: 0 40px 90px rgba(0,0,0,.6); overflow: hidden; }
+  .chip { position: absolute; padding: 10px 18px; border-radius: 30px; background: rgba(61,139,255,.15); border: 2px solid rgba(61,139,255,.6); font: 600 24px Inter; color: #CFE0FF; }
+  .blk { position: absolute; width: 250px; height: 130px; border-radius: 14px; background: #0F2748; border: 3px solid var(--sig); font: 600 30px Inter; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .blk small { font: 500 19px Inter; color: var(--mute); margin-top: 6px; }
+  .shot { position: absolute; border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.6); background: #fff; }
+  .shot img { width: 100%; display: block; }
+  .soft { filter: blur(6px) brightness(.45) saturate(.6); }
+</style></head><body>
+
+<!-- 1 Hook: four logo stripes sweep across navy -->
+<div class="f" id="f1" style="background: var(--navy)">
+  <div class="stripe" style="left:-200px; width:1500px; top:420px"></div>
+  <div class="stripe" style="left:200px; width:1900px; top:488px; opacity:.9"></div>
+  <div class="stripe" style="left:-100px; width:1300px; top:556px; opacity:.8"></div>
+  <div class="stripe" style="left:500px; width:1600px; top:624px; opacity:.7"></div>
+</div>
+
+<!-- 2 Field assets: stripes become four signal lines from four field assets -->
+<div class="f" id="f2"><div class="grid"></div>
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080">
+    <g stroke="#3D8BFF" stroke-width="5" fill="none" opacity=".9">
+      <path d="M330 300 C 700 300, 900 470, 1240 500"/><path d="M330 470 C 700 470, 900 520, 1240 530"/>
+      <path d="M330 640 C 700 640, 900 560, 1240 560"/><path d="M330 810 C 700 810, 900 610, 1240 590"/>
+    </g>
+    <g fill="#3D8BFF"><circle cx="760" cy="335" r="9"/><circle cx="640" cy="470" r="9"/><circle cx="900" cy="600" r="9"/><circle cx="700" cy="760" r="9"/></g>
+    <!-- transformer -->
+    <g transform="translate(230 300)" fill="#1C2C44" stroke="#9FB6D8" stroke-width="4"><rect x="-55" y="-40" width="110" height="80" rx="6"/><path d="M-70 -30v60M-82 -30v60M70 -30v60M82 -30v60"/><path d="M-25 -40v-30M0 -40v-38M25 -40v-30"/></g>
+    <!-- feeder pillar -->
+    <g transform="translate(230 470)" fill="#1C2C44" stroke="#9FB6D8" stroke-width="4"><rect x="-38" y="-55" width="76" height="110" rx="6"/><path d="M-20 -30h40M-20 -10h40"/></g>
+    <!-- meter -->
+    <g transform="translate(230 640)" fill="#1C2C44" stroke="#9FB6D8" stroke-width="4"><rect x="-45" y="-50" width="90" height="100" rx="10"/><circle cy="-8" r="24"/><path d="M0 -8l14 -12"/></g>
+    <!-- PV + battery -->
+    <g transform="translate(230 810)" fill="#1C2C44" stroke="#9FB6D8" stroke-width="4"><path d="M-80 20l30 -60h70l-30 60z"/><path d="M-65 -10h70M-35 -40l-30 60M-5 -40l-30 60"/><rect x="35" y="-30" width="45" height="60" rx="5"/><path d="M50 -38h15"/></g>
+  </svg>
+  <div class="line" style="top:110px">Connect the assets that matter.</div>
+</div>
+
+<!-- 3 Converge: lines meet the DIS panel, protocol chips ride the lines -->
+<div class="f" id="f3"><div class="grid"></div>
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080"><g stroke="#3D8BFF" stroke-width="5" fill="none">
+    <path d="M-50 260 C 400 260, 600 470, 800 500"/><path d="M-50 430 C 400 430, 600 520, 800 530"/>
+    <path d="M-50 720 C 400 720, 600 560, 800 560"/><path d="M-50 900 C 400 900, 600 610, 800 590"/></g></svg>
+  <div class="chip" style="left:180px; top:300px">IEC 104</div><div class="chip" style="left:300px; top:445px">Modbus TCP</div>
+  <div class="chip" style="left:160px; top:670px">IEC 61850</div><div class="chip" style="left:330px; top:845px">MQTT</div>
+  <div class="panel" style="left:800px; top:300px; width:420px; height:520px; background:#C9CCC6; border:6px solid #B3B7AF">
+    <div style="position:absolute; left:60px; top:70px; right:60px; height:230px; background:#0D1420; border-radius:10px; border:4px solid #8D918A"></div>
+    <div style="position:absolute; left:60px; bottom:60px; font:700 34px Inter; color:#114B9B">SAE DIS</div>
+  </div>
+  <div class="line" style="top:110px">Speak the language of your assets.</div>
+</div>
+
+<!-- 4 Inside: logic blocks run Acquire > Calculate > Evaluate > Act -->
+<div class="f" id="f4" style="background: radial-gradient(ellipse at 50% 50%, #0F2341, #050A14 75%)">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080"><g stroke="#3D8BFF" stroke-width="5"><path d="M480 560h90M820 560h90M1160 560h90"/></g></svg>
+  <div class="blk" style="left:230px; top:495px">Acquire<small>field values</small></div>
+  <div class="blk" style="left:570px; top:495px">Calculate<small>logic + equations</small></div>
+  <div class="blk" style="left:910px; top:495px">Evaluate<small>conditions</small></div>
+  <div class="blk" style="left:1250px; top:495px; border-color: var(--ok)">Act &amp; display<small>outputs + HMI</small></div>
+  <div style="position:absolute; left:250px; top:700px; font:500 24px 'JetBrains Mono', monospace; color:#6F86A8">IF oil_temp &gt; limit THEN alarm := TRUE;</div>
+  <div class="line" style="top:150px">From field signals to on-site decisions.</div>
+</div>
+
+<!-- 5 HMI: the last block becomes the built-in HMI -->
+<div class="f" id="f5">
+  <div class="shot" style="left:260px; top:210px; width:1400px"><img src="img/hmi-system-overview.png"></div>
+  <div class="line" style="top:70px; font-size:56px">See the result at the site.</div>
+</div>
+
+<!-- 6 Pull back: HMI is one of three views, uplink rises to SCADA -->
+<div class="f" id="f6"><div class="grid"></div>
+  <div class="shot" style="left:140px; top:360px; width:520px; transform: perspective(1400px) rotateY(18deg)"><img src="img/hmi-single-line-diagram.png"></div>
+  <div class="shot" style="left:700px; top:320px; width:520px"><img src="img/hmi-system-overview.png"></div>
+  <div class="shot" style="left:1260px; top:360px; width:520px; transform: perspective(1400px) rotateY(-18deg); background:#0E1726">
+    <svg width="520" height="280" viewBox="0 0 520 280" style="position:relative"><rect width="520" height="280" fill="#0E1726"/><g stroke="#3D8BFF" stroke-width="4" fill="none"><path d="M30 220 L110 180 L190 196 L270 120 L350 140 L430 80 L490 96"/></g><g fill="#2BD47D"><rect x="40" y="235" width="40" height="25"/><rect x="120" y="225" width="40" height="35"/><rect x="200" y="215" width="40" height="45"/></g><text x="30" y="40" fill="#CFE0FF" font-family="Inter" font-size="22" font-weight="600">On-site analytics (optional)</text></svg></div>
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080"><path d="M960 320 V 130" stroke="#3D8BFF" stroke-width="5" stroke-dasharray="14 12"/><text x="985" y="150" fill="#CFE0FF" font-family="Inter" font-size="26" font-weight="600">SCADA · control centre</text></svg>
+  <div class="line" style="top:800px; font-size:56px">Process locally. Operate intelligently.</div>
+</div>
+
+<!-- 7 Three lines, word by word, while the views fold into four stripes -->
+<div class="f" id="f7" style="background: var(--navy)">
+  <div class="line" style="top:330px">Connect the field.</div>
+  <div class="line" style="top:430px">Process at the edge.</div>
+  <div class="line" style="top:530px">See <span class="dim">the result.</span></div>
+  <div class="stripe" style="left:560px; width:800px; top:740px; height:14px; opacity:.9"></div>
+  <div class="stripe" style="left:560px; width:800px; top:768px; height:14px; opacity:.7"></div>
+  <div class="stripe" style="left:560px; width:800px; top:796px; height:14px; opacity:.5"></div>
+  <div class="stripe" style="left:560px; width:800px; top:824px; height:14px; opacity:.3"></div>
+</div>
+
+<!-- 8 End card: stripes become the logo; URL + CTA -->
+<div class="f" id="f8" style="background: var(--navy)">
+  <img src="logo/sae-logo-white.svg" style="position:absolute; left:610px; top:270px; width:700px">
+  <div style="position:absolute; left:0; right:0; top:700px; text-align:center; font:600 40px Inter; letter-spacing:-1px">sae-malaysia.com</div>
+  <div style="position:absolute; left:0; right:0; top:760px; text-align:center; font:400 28px Inter; color:var(--mute)">Talk to us about your DIS application.</div>
+  <img src="img/iso9001-bsi.jpg" style="position:absolute; right:60px; bottom:50px; width:170px; border-radius:6px">
+</div>
+</body></html>
