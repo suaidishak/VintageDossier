@@ -1,5 +1,5 @@
 # Motion Design status
-step: 2 Assets - logo rebuilt as vector (assets/logo-rebuild, 93.5% overlap with brochure raster); waiting for user check + remaining assets
+step: 3 Ending - assets accepted as-is (brochure images in assets/brochure, git-ignored; re-extract from the uploaded brochure if missing). Waiting for CTA pick
 env: Node 22, Python 3 + Pillow/numpy/scipy/opencv, ffmpeg 6.1, Chrome 158 (headless). No GPU: 3D renders via
      software WebGL, run with CHROME=motion-design/scripts/chrome-cloud.sh (template test render OK).
 brand: SAE DIS (Distribution Interface Switch) - project folder "SAE DIS/". Brochure kept out of git (uploaded file).
