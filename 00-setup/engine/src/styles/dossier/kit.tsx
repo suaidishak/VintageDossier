@@ -143,11 +143,11 @@ export const StringLine: React.FC<{ a: [number, number]; b: [number, number]; t:
 };
 
 // ---------- rubber stamp ----------
-export const Stamp: React.FC<{ text: string; t: number; x: number; y: number; rot?: number; size?: number }> = ({ text, t, x, y, rot = -9, size = 64 }) => {
+export const Stamp: React.FC<{ text: string; t: number; x: number; y: number; rot?: number; size?: number; blend?: "multiply" | "normal" }> = ({ text, t, x, y, rot = -9, size = 64, blend = "multiply" }) => {
   const { f, fr, fps } = useSec(); if (f < fr(t)) return null;
   const p = spring({ frame: f - fr(t), fps, config: { damping: 14, stiffness: 420, mass: 0.5 } });
   const sc = interpolate(p, [0, 1], [2.2, 1]); const op = interpolate(p, [0, 0.4], [0, 0.92], clamp);
-  return <div style={{ position: "absolute", left: x, top: y, transform: `translate(-50%,-50%) rotate(${rot}deg) scale(${sc})`, opacity: op, border: `6px solid ${T.color.red}`, outline: `2px solid ${T.color.red}`, outlineOffset: 5, color: T.color.red, fontFamily: T.font.mono, fontWeight: 700, fontSize: size, letterSpacing: "0.12em", padding: "6px 22px", whiteSpace: "nowrap", mixBlendMode: "multiply", maskImage: "radial-gradient(circle at 30% 40%, #000 55%, rgba(0,0,0,0.75) 70%, #000 85%)" }}>{text}</div>;
+  return <div style={{ position: "absolute", left: x, top: y, transform: `translate(-50%,-50%) rotate(${rot}deg) scale(${sc})`, opacity: op, border: `6px solid ${T.color.red}`, outline: `2px solid ${T.color.red}`, outlineOffset: 5, color: T.color.red, fontFamily: T.font.mono, fontWeight: 700, fontSize: size, letterSpacing: "0.12em", padding: "6px 22px", whiteSpace: "nowrap", mixBlendMode: blend, maskImage: "radial-gradient(circle at 30% 40%, #000 55%, rgba(0,0,0,0.75) 70%, #000 85%)" }}>{text}</div>;
 };
 
 // ================= ONE-WORLD SYSTEM (continuous desk, camera glides) =================
@@ -168,8 +168,8 @@ export const WorldCam: React.FC<{ keys: K[]; children: React.ReactNode; maxBlur?
   </AbsoluteFill>;
 };
 /** desk surface covering the whole world */
-export const WorldDesk: React.FC<{ w: number; h: number }> = ({ w, h }) => <div style={{ position: "absolute", left: -1500, top: -1500, width: w + 3000, height: h + 3000, background: T.color.desk }}>
-  <Img src={staticFile("desk.jpg")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} /></div>;
+export const WorldDesk: React.FC<{ w: number; h: number; src?: string }> = ({ w, h, src = "desk.jpg" }) => <div style={{ position: "absolute", left: -1500, top: -1500, width: w + 3000, height: h + 3000, background: T.color.desk }}>
+  <Img src={staticFile(src)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} /></div>;
 
 export const printBox = (w: number, aspect: number) => { const b = w * T.shape.printBorder; return { b, W: w + 2 * b, H: w / aspect + 2.3 * b }; };
 /** print in world space: keys = center x,y + scale s + rot r; drops onto the desk at t0 */

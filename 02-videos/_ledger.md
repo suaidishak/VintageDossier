@@ -14,4 +14,8 @@ anwar-ibrahim-biography | 2 | 10+15+12 | 1997 tape roll, two prints + string cro
 anwar-ibrahim-biography | 2 | 2/14/9/15 | Reformasi print, arrest circle, courtroom verdict sheet, strike + OVERTURNED, 2004 roll | vertical glides | desk | push | colour + AI courtroom
 anwar-ibrahim-biography | 2 | 5+4 | map 2 Permatang Pauh pulse, prison print + stamp | arc glide | 2010 map | push | AI prison
 anwar-ibrahim-biography | 3 | 1/2/12/10/1/2/7 | 2018 card, alliance print circle, PARDONED, 82 seats roll vs 112, 2022 card, PM portrait, finale string PRISONER -> PM | burn flash, vertical glides | desk | pull back z .8 end | colour prints
-Topics already made: WW2 start (Poland 1939, sample only); Anwar Ibrahim biography (2026-11-25, 9:16, 1:57)
+syed-mokhtar-albukhary-biography | 1 | permit card (new) | lorry icons drive onto a transport permit, 2 vs 4 roll, red circle | lorries roll in from left | desk seed 83 | hold then glide down | cartoon lorries
+syed-mokhtar-albukhary-biography | 1 | 1+5 / 13 | 1951 card over Kedah map, Indian Ocean map with Yemen->Kedah arrow | arc glides | 2010 peninsula + 2010 Indian Ocean | push | AI cattle/paddy/lorry prints
+syed-mokhtar-albukhary-biography | 2 | 1/6/7/10 | 1990s card, empire pictograms pop on map (crane, power, plane, rice), evidence board of cards + strings, US$ BN roll, GROUP/DEBT bars, NO COMMENT stamp | burn flash, vertical glides | desk | push | colour prints, index cards
+syed-mokhtar-albukhary-biography | 3 | 3/1/7 | CRITICS vs SUPPORTERS tapes, quote typed, 1976 card, 15 families roll, university print, lorry-to-university string finale | burn flash | desk | pull back z .82 | reused Mahathir/Anwar prints
+Topics already made: WW2 start (Poland 1939, sample only); Anwar Ibrahim biography (2026-11-25, 9:16, 1:57); Syed Mokhtar Albukhary biography (2026-11-26, 9:16, 1:51)
