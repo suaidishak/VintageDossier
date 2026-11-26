@@ -20,6 +20,7 @@ He acted, he sang, he composed, and then he directed.
 Hang Tuah won an Asian film award for its music.
 Anakku Sazali made him Best Actor in Tokyo.
 Bujang Lapok made a whole region laugh.
+His duets with the singer Saloma, later his wife, became the soundtrack of a generation.
 In all, he acted in sixty-six films, and directed thirty-five.
 
 ## Chapter 3 - The Legend
@@ -30,7 +31,7 @@ On the 29th of May 1973, his heart gave out.
 Then Malaysia remembered.
 His songs and films found a new generation.
 In 1990, he was honoured, after his death, with the title Tan Sri.
-His childhood home in Penang is now a museum.
+His childhood home in Penang is now a museum, and streets in Penang and Kuala Lumpur carry his name.
 The boy from Penang never stopped singing. A nation simply learned to listen.
 
 ---
