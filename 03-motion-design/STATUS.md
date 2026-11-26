@@ -1,5 +1,5 @@
 # Motion Design status
-step: 4 Storyboard shown (ending A: logo + sae-malaysia.com + "Talk to us about your DIS application.") - waiting for approval/notes. 8 shots, see SAE DIS/storyboard/storyboard.html (frames.html renders key frames)
+step: 5 Build - page at SAE DIS/build/page.html (stills reviewed, review sheet out/review-sheet-v1.jpg). Waiting for stills approval. Render: CHROME=motion-design/scripts/chrome-cloud.sh node motion-design/scripts/render.mjs video ... --gpu
 env: Node 22, Python 3 + Pillow/numpy/scipy/opencv, ffmpeg 6.1, Chrome 158 (headless). No GPU: 3D renders via
      software WebGL, run with CHROME=motion-design/scripts/chrome-cloud.sh (template test render OK).
 brand: SAE DIS (Distribution Interface Switch) - project folder "SAE DIS/". Brochure kept out of git (uploaded file).

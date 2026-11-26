@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SAE DIS ad</title>
+<style>
+  @font-face { font-family: UI; src: url("fonts/Inter-Regular.otf"); font-weight: 400; }
+  @font-face { font-family: UI; src: url("fonts/Inter-SemiBold.otf"); font-weight: 600; }
+  @font-face { font-family: UI; src: url("fonts/Inter-Bold.otf"); font-weight: 700; }
+  @font-face { font-family: Code; src: url("fonts/JetBrainsMono-Medium.ttf"); font-weight: 500; }
+  html,body{margin:0;background:#000;height:100%} body{display:flex;align-items:center;justify-content:center}
+  canvas{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;display:block}
+</style></head><body><canvas id="c"></canvas>
+<script src="gl3d.js"></script>
+<script>
+// SAE DIS, 30s. One continuous camera: logo stripes -> signal lines -> DIS panel -> logic -> HMI -> stripes -> logo.
+// Page contract: renderAt(t), TOTAL, ready, EVENTS, ?t= for a still, ?scale=2 for 4K. Render with --gpu.
+
+// ---------------------------------------------------------------- BEATS (all timing lives here)
+const BEAT = {
+  sweep: [0.15, 1.5],        // shot 1: four stripes sweep in
+  fadeStripes: [1.5, 2.9],   // stripes hand over to the blue signal lines
+  pulses: 2.0,               // light starts travelling along the lines
+  l1: [3.0, 6.7],            // "Connect the assets that matter."
+  chips: [6.2, 10.1],        // protocol tags ride the lines into the DIS
+  l2: [7.2, 10.2],           // "Speak the language of your assets."
+  enter: 11.55,              // camera passes through the DIS window
+  l3: [11.9, 15.0],          // "From field signals to on-site decisions."
+  blocks: [12.2, 12.9, 13.6, 14.3],   // each logic block lights in turn
+  code: [12.3, 14.0],        // Structured Text line types on
+  grow: [14.7, 16.3],        // "Act & display" block becomes the HMI
+  badges: [16.5, 17.7],      // HMI status lights turn green
+  alarm: 18.4,               // oil-temp alarm toast slides in
+  l4: [16.5, 19.6],          // "See the result at the site."
+  l5: [20.6, 22.9],          // "Process locally. Operate intelligently."
+  squash: [22.8, 24.0],      // the three screens collapse into the four stripes
+  promise: [23.9, 26.0],     // "Connect the field. / Process at the edge. / See the result."
+  rise: [26.4, 27.2],        // stripes slide up into the logo position
+  cut: [27.0, 27.4],         // gaps open: S | A | E
+  build: [27.2, 28.0],       // S, A, E rise out of the stripes
+  word: [27.7, 28.3],        // MALAYSIA
+  cta: [28.0, 28.7],         // URL + call to action
+  sweepLight: [28.3, 29.0],  // light sweep across the logo
+  END: 30,
+};
+window.EVENTS = [
+  { name: 'stripes_in', t: BEAT.sweep[0] }, { name: 'pull_back', t: 0.9 }, { name: 'pulses', t: BEAT.pulses },
+  { name: 'line1', t: BEAT.l1[0] }, { name: 'chips', t: BEAT.chips[0] }, { name: 'line2', t: BEAT.l2[0] },
+  { name: 'push_in', t: 10.4 }, { name: 'through_window', t: BEAT.enter }, { name: 'line3', t: BEAT.l3[0] },
+  ...BEAT.blocks.map((t, i) => ({ name: 'block_' + (i + 1), t })), { name: 'hmi_grow', t: BEAT.grow[0] },
+  { name: 'line4', t: BEAT.l4[0] }, ...[0, 1, 2, 3, 4].map(i => ({ name: 'badge_ok', t: BEAT.badges[0] + i * 0.3 })),
+  { name: 'alarm', t: BEAT.alarm }, { name: 'pull_back_2', t: 19.6 }, { name: 'line5', t: BEAT.l5[0] },
+  { name: 'squash', t: BEAT.squash[0] }, { name: 'promise', t: BEAT.promise[0] }, { name: 'logo_build', t: BEAT.build[0] },
+  { name: 'logo_land', t: BEAT.build[1] }, { name: 'cta', t: BEAT.cta[0] }, { name: 'light_sweep', t: BEAT.sweepLight[0] }, { name: 'end', t: 30 },
+];
+
+// ---------------------------------------------------------------- setup
+const END = BEAT.END, W = 1920, H = 1080, q = new URLSearchParams(location.search), SCALE = parseFloat(q.get('scale') || '1');
+const cv = document.getElementById('c'); cv.width = W * SCALE; cv.height = H * SCALE; const MAIN = cv.getContext('2d');
+const mk = (w = cv.width, h = cv.height) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const TMP = mk(), ACC = mk(), S3 = GL3D.create(W * SCALE, H * SCALE);
+const clamp01 = v => Math.max(0, Math.min(1, v)), lerp = (a, b, k) => a + (b - a) * k, prog = (t, a, b) => clamp01((t - a) / (b - a));
+const outExpo = k => (k = clamp01(k)) >= 1 ? 1 : 1 - Math.pow(2, -10 * k), outCubic = k => 1 - Math.pow(1 - clamp01(k), 3);
+const inOutCubic = k => { k = clamp01(k); return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; }, sine = k => 0.5 - 0.5 * Math.cos(Math.PI * clamp01(k));
+const mixC = (a, b, k) => `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], k))).join(',')})`;
+const C = { navy: [11, 31, 58], deep: [6, 13, 26], sig: '#3D8BFF', ok: '#2BD47D', ink: '#F2F5FA', mute: '#8FA3C0', bad: '#E5484D' };
+const TS = 2;   // texture supersampling
+
+function tex(w, h, draw) {   // a 2D-canvas texture panel; redraw(...args) skips identical args
+  const c = document.createElement('canvas'); c.width = Math.round(w * TS); c.height = Math.round(h * TS); const p = { c, w, h, tex: null, key: null };
+  p.redraw = (...a) => { const key = JSON.stringify(a); if (key === p.key && p.tex) return p; p.key = key; const g = c.getContext('2d');
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); g.setTransform(TS, 0, 0, TS, 0, 0); draw(g, ...a);
+    if (p.tex) p.tex.update(); else p.tex = S3.texture(c); return p; };
+  return p;
+}
+const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+
+// ---------------------------------------------------------------- monotone camera keys (C1, no overshoot, no reversals)
+function track(keys) {   // keys: [[t, v], ...] -> f(t), Fritsch-Carlson monotone cubic
+  const n = keys.length, x = keys.map(k => k[0]), y = keys.map(k => k[1]), d = [], m = new Array(n).fill(0);
+  for (let i = 0; i < n - 1; i++) d.push((y[i + 1] - y[i]) / (x[i + 1] - x[i]));
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : 3 * (x[i + 1] - x[i - 1]) / ((2 * x[i + 1] - x[i] - x[i - 1]) / d[i - 1] + (x[i + 1] + x[i] - 2 * x[i - 1]) / d[i]);
+  m[0] = 0; m[n - 1] = 0;
+  return t => { if (t <= x[0]) return y[0]; if (t >= x[n - 1]) return y[n - 1]; let i = 0; while (t > x[i + 1]) i++;
+    const h = x[i + 1] - x[i], s = (t - x[i]) / h, s2 = s * s, s3 = s2 * s;
+    return (2 * s3 - 3 * s2 + 1) * y[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * y[i + 1] + (s3 - s2) * h * m[i + 1]; };
+}
+const HMI_Z = -1800, HMI_X = 600;
+const CAM = {
+  ex: track([[0, -1450], [3.2, -1440], [6.5, -1180], [9.4, -70], [10.6, 0], [14.6, 0], [16.3, HMI_X], [19.6, HMI_X + 90], [23.6, HMI_X + 420], [24.2, HMI_X + 440]]),
+  ey: track([[0, 130], [3.2, 128], [9.4, 95], [11.0, 60], [12.4, 40], [19.6, 40], [23.6, 260], [24.2, 270]]),
+  ez: track([[0, 470], [0.5, 510], [1.4, 1200], [2.4, 1850], [3.6, 2120], [6.2, 2200], [9.4, 1720], [10.5, 1150], [11.2, 330], [11.8, -40], [12.6, -95], [16.3, -110],
+             [19.6, -125], [20.6, 300], [22.4, 2300], [23.6, 2750], [24.2, 2800]]),
+  tx: track([[0, -1400], [3.2, -1390], [6.5, -1000], [9.4, -40], [10.0, 0], [14.6, 0], [16.3, HMI_X], [24.2, HMI_X]]),
+  ty: track([[0, 0], [14.6, 0], [16.3, 45], [19.6, 45], [22.6, 170], [24.2, 180]]),
+  tz: track([[0, 0], [9.6, 0], [10.6, -500], [11.6, -1500], [12.2, HMI_Z], [24.2, HMI_Z]]),
+};
+function camera(t) {
+  return { eye: [CAM.ex(t), CAM.ey(t), CAM.ez(t)], target: [CAM.tx(t), CAM.ty(t), CAM.tz(t)], fov: 34,
+    focus: Math.hypot(CAM.ex(t) - CAM.tx(t), CAM.ey(t) - CAM.ty(t), CAM.ez(t) - CAM.tz(t)), aperture: 0.9,
+    fog: { near: 4400, far: 11000, color: C.deep.map(v => v / 255) } };
+}
+
+// ---------------------------------------------------------------- world: field network
+const ASSETS = [{ y: 270, name: 'Transformer' }, { y: 90, name: 'Feeder pillar' }, { y: -90, name: 'Energy meter' }, { y: -270, name: 'PV + storage' }];
+const NET = { x0: -2340, x1: -200, y0: -520, y1: 520 };   // network texture bounds (world)
+const BUS = [36, 12, -12, -36], PORT = [54, 18, -18, -54];
+function bez(p0, p1, p2, p3, n) { const o = []; for (let i = 1; i <= n; i++) { const s = i / n, u = 1 - s; o.push([u * u * u * p0[0] + 3 * u * u * s * p1[0] + 3 * u * s * s * p2[0] + s * s * s * p3[0], u * u * u * p0[1] + 3 * u * u * s * p1[1] + 3 * u * s * s * p2[1] + s * s * s * p3[1]]); } return o; }
+const LINES = ASSETS.map((a, i) => {   // polyline in world x/y (z = 0): asset -> bus -> DIS port
+  let pts = [[-2120, a.y]]; pts = pts.concat(bez([-2120, a.y], [-1900, a.y], [-1950, BUS[i]], [-1750, BUS[i]], 40));
+  pts.push([-1050, BUS[i]]); pts = pts.concat(bez([-1050, BUS[i]], [-700, BUS[i]], [-600, PORT[i]], [-232, PORT[i]], 40));
+  const L = [0]; for (let k = 1; k < pts.length; k++) L.push(L[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
+  return { pts, L, len: L[L.length - 1] };
+});
+function along(line, u) { const s = clamp01(u) * line.len; let k = 1; while (k < line.L.length - 1 && line.L[k] < s) k++;
+  const f = (s - line.L[k - 1]) / Math.max(1e-6, line.L[k] - line.L[k - 1]); return [lerp(line.pts[k - 1][0], line.pts[k][0], f), lerp(line.pts[k - 1][1], line.pts[k][1], f)]; }
+
+const T = {};
+function drawNet(g, col) {
+  g.translate(-NET.x0, NET.y1); g.scale(1, -1); g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const ln of LINES) { g.beginPath(); ln.pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.strokeStyle = col; g.lineWidth = 11; g.stroke(); }
+  g.fillStyle = col; for (const ln of LINES) { const [x, y] = ln.pts[0]; g.beginPath(); g.arc(x, y, 13, 0, 7); g.fill(); }
+}
+function drawAsset(g, i) {   // clean line-art icons (centre 110,90 in a 220x220 tile)
+  g.strokeStyle = '#A9C1E4'; g.fillStyle = '#132640'; g.lineWidth = 5; g.lineJoin = 'round'; g.lineCap = 'round';
+  g.save(); g.translate(110, 92);
+  if (i === 0) { rr(g, -52, -34, 104, 76, 8); g.fill(); g.stroke(); for (const x of [-66, -76, 66, 76]) { g.beginPath(); g.moveTo(x, -26); g.lineTo(x, 34); g.stroke(); }
+    for (const x of [-26, 0, 26]) { g.beginPath(); g.moveTo(x, -34); g.lineTo(x, -64); g.stroke(); g.beginPath(); g.arc(x, -68, 5, 0, 7); g.stroke(); } }
+  if (i === 1) { rr(g, -40, -62, 80, 124, 8); g.fill(); g.stroke(); g.beginPath(); g.moveTo(0, -62); g.lineTo(0, 62); g.stroke();
+    for (const s of [-1, 1]) { g.beginPath(); g.moveTo(s * 10, -8); g.lineTo(s * 10, 8); g.stroke(); } g.beginPath(); g.moveTo(-48, 62); g.lineTo(48, 62); g.stroke(); }
+  if (i === 2) { rr(g, -46, -58, 92, 116, 12); g.fill(); g.stroke(); rr(g, -28, -40, 56, 24, 4); g.stroke(); g.beginPath(); g.arc(0, 18, 22, Math.PI, 2 * Math.PI); g.stroke();
+    g.beginPath(); g.moveTo(0, 18); g.lineTo(14, 4); g.stroke(); }
+  if (i === 3) { g.beginPath(); g.moveTo(-90, 34); g.lineTo(-62, -30); g.lineTo(22, -30); g.lineTo(-6, 34); g.closePath(); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(-76, 2); g.lineTo(8, 2); g.moveTo(-48, -30); g.lineTo(-62, 34); g.moveTo(-20, -30); g.lineTo(-34, 34); g.stroke();
+    rr(g, 40, -38, 46, 72, 6); g.fill(); g.stroke(); g.beginPath(); g.moveTo(54, -46); g.lineTo(72, -46); g.stroke(); g.beginPath(); g.moveTo(52, 0); g.lineTo(74, 0); g.stroke(); }
+  g.restore(); g.font = '600 24px UI'; g.fillStyle = '#C9D7EC'; g.textAlign = 'center'; g.fillText(ASSETS[i].name, 110, 206);
+}
+function drawGlow(g, col) { const r = g.createRadialGradient(40, 40, 0, 40, 40, 40); r.addColorStop(0, col); r.addColorStop(0.25, col.replace('1)', '0.55)')); r.addColorStop(1, col.replace('1)', '0)')); g.fillStyle = r; g.fillRect(0, 0, 80, 80); }
+function drawChip(g, s, w) { rr(g, 3, 3, w - 6, 50, 25); g.fillStyle = 'rgba(20,46,86,0.95)'; g.fill(); g.lineWidth = 3; g.strokeStyle = 'rgba(61,139,255,0.9)'; g.stroke();
+  g.font = '600 24px UI'; g.fillStyle = '#DCE8FF'; g.textAlign = 'center'; g.fillText(s, w / 2, 37); }
+const CHIPS = ['IEC 104', 'Modbus TCP', 'IEC 62056-21', 'MQTT'];
+
+// ---------------------------------------------------------------- world: DIS enclosure (rebuilt as shapes from the panel photo)
+const DIS = { w: 460, h: 580, d: 170, win: { x: 80, y: 70, w: 300, h: 230 } };   // window in panel coords (top-left origin)
+function drawDIS(g) {
+  const { w, h, win } = DIS; const body = g.createLinearGradient(0, 0, w, h); body.addColorStop(0, '#D9DCD6'); body.addColorStop(1, '#B7BBB3');
+  g.fillStyle = body; rr(g, 0, 0, w, h, 16); g.fill(); g.strokeStyle = '#A3A79F'; g.lineWidth = 4; rr(g, 14, 14, w - 28, h - 28, 10); g.stroke();
+  g.globalCompositeOperation = 'destination-out'; rr(g, win.x, win.y, win.w, win.h, 10); g.fill(); g.globalCompositeOperation = 'source-over';   // see-through window
+  g.strokeStyle = '#8D918A'; g.lineWidth = 8; rr(g, win.x - 4, win.y - 4, win.w + 8, win.h + 8, 12); g.stroke();
+  g.fillStyle = '#7E827A'; rr(g, w - 52, 300, 18, 92, 8); g.fill();   // handle
+  for (const [x, c] of [[110, '#2BD47D'], [150, '#F5B83D']]) { g.fillStyle = c; g.beginPath(); g.arc(x, 352, 10, 0, 7); g.fill(); }
+  g.fillStyle = '#114B9B'; g.font = '700 34px UI'; g.fillText('SAE DIS', 80, 470); g.fillStyle = '#5E625B'; g.font = '400 19px UI'; g.fillText('Distribution Interface Switch', 80, 500);
+}
+const solid = col => tex(8, 8, g => { g.fillStyle = col; g.fillRect(0, 0, 8, 8); });
+
+// ---------------------------------------------------------------- world: logic chain
+const BLK = { w: 300, h: 161, xs: [-600, -200, 200, 600], names: [['Acquire', 'field values'], ['Calculate', 'logic + equations'], ['Evaluate', 'conditions'], ['Act & display', 'outputs + HMI']] };
+function drawBlock(g, i, lit) {
+  const { w, h } = BLK; rr(g, 3, 3, w - 6, h - 6, 18); g.fillStyle = lit > 0 ? mixC([15, 39, 72], [19, 64, 120], lit) : '#0F2748'; g.fill();
+  g.lineWidth = 4; g.strokeStyle = lit > 0 ? mixC([61, 139, 255], i === 3 ? [43, 212, 125] : [150, 200, 255], lit) : 'rgba(61,139,255,0.7)'; g.stroke();
+  g.textAlign = 'center'; g.fillStyle = '#F2F5FA'; g.font = '600 34px UI'; g.fillText(BLK.names[i][0], w / 2, 78); g.fillStyle = '#9DB2D1'; g.font = '400 21px UI'; g.fillText(BLK.names[i][1], w / 2, 112);
+}
+const CODE = 'IF oil_temp > limit THEN alarm := TRUE;';
+function drawCode(g, n) { g.font = '500 28px Code'; g.fillStyle = '#7F98BD'; g.fillText(CODE.slice(0, n), 0, 32); if (n < CODE.length) { const x = g.measureText(CODE.slice(0, n)).width; g.fillStyle = '#3D8BFF'; g.fillRect(x + 3, 8, 3, 30); } }
+
+// ---------------------------------------------------------------- HMI screens (faithful vector rebuilds of the ELMINA PE 16 screens; site names generalised)
+const HW = 1500, HH = 806;
+function hmiFrame(g, title) {
+  g.fillStyle = '#EEF0F2'; g.fillRect(0, 0, HW, HH); g.fillStyle = '#E2E5E9'; g.fillRect(0, 0, HW, 78); g.fillStyle = '#C9CED5'; g.fillRect(0, 78, HW, 2);
+  g.strokeStyle = '#D23A35'; g.lineWidth = 4; rr(g, 20, 20, 40, 38, 6); g.stroke(); g.beginPath(); g.moveTo(28, 48); g.lineTo(40, 30); g.lineTo(52, 48); g.stroke();
+  g.fillStyle = '#2B2F36'; g.font = '600 28px UI'; g.fillText('PE16', 76, 50);
+  const nav = ['MAIN', 'COMM', 'ELECT', 'SLD', 'SOE', 'AML']; nav.forEach((s, i) => { const x = 200 + i * 88; g.fillStyle = '#2B2F36'; rr(g, x + 22, 16, 28, 26, 4); g.fill(); g.font = '600 15px UI'; g.textAlign = 'center'; g.fillText(s, x + 36, 64); g.textAlign = 'left'; });
+  g.fillStyle = '#1D2128'; g.font = '700 32px UI'; g.textAlign = 'center'; g.fillText(title, 860, 52);
+  g.fillStyle = '#E53935'; g.fillRect(1010, 14, 200, 50); g.fillStyle = '#fff'; g.font = '600 17px UI'; g.fillText('NOP', 1110, 35); g.fillText('SWITCHING', 1110, 56);
+  g.fillStyle = '#21E05A'; g.fillRect(1268, 18, 128, 44); g.fillStyle = '#0B3D1C'; g.font = '600 20px UI'; g.fillText('LOG-IN', 1332, 47);
+  g.fillStyle = '#2B2F36'; g.font = '500 17px UI'; g.fillText('10:01:55', 1448, 36); g.fillText('01.10.2026', 1448, 58); g.textAlign = 'left';
+}
+function tag(g, x, y, s, w = 120) { g.fillStyle = '#A9AEB5'; rr(g, x, y, w, 34, 6); g.fill(); g.fillStyle = '#fff'; g.font = '700 20px UI'; g.textAlign = 'center'; g.fillText(s, x + w / 2, y + 25); g.textAlign = 'left'; }
+function badge(g, x, y, ok) { g.fillStyle = ok ? '#2BBF5E' : '#E53935'; g.beginPath(); g.arc(x, y, 15, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 4; g.beginPath();
+  if (ok) { g.moveTo(x - 7, y); g.lineTo(x - 2, y + 6); g.lineTo(x + 8, y - 6); } else { g.moveTo(x - 6, y - 6); g.lineTo(x + 6, y + 6); g.moveTo(x + 6, y - 6); g.lineTo(x - 6, y + 6); } g.stroke(); }
+function readout(g, x, y, rows) { g.textAlign = 'right'; rows.forEach(([k, v], i) => { g.fillStyle = '#3A3F47'; g.font = '400 15px UI'; g.fillText(k, x, y + i * 44); g.fillStyle = '#18A83F'; g.font = '700 22px UI'; g.fillText(v, x, y + i * 44 + 22); }); g.textAlign = 'left'; }
+const ICON = {
+  tx(g, x, y) { g.fillStyle = '#C64A3E'; g.fillRect(x, y, 120, 26); g.fillStyle = '#9FB3C6'; rr(g, x + 14, y + 26, 92, 80, 6); g.fill(); g.fillStyle = '#7A8C9E'; for (let k = 0; k < 6; k++) g.fillRect(x + 20 + k * 15, y + 32, 6, 68); g.fillStyle = '#2B2F36'; g.fillRect(x + 2, y + 40, 10, 70); g.fillRect(x + 108, y + 40, 10, 70); },
+  meter(g, x, y) { g.fillStyle = '#DADDE1'; rr(g, x, y, 56, 76, 6); g.fill(); g.fillStyle = '#5E7F64'; g.fillRect(x + 10, y + 12, 36, 18); g.fillStyle = '#9AA0A8'; g.fillRect(x + 12, y + 40, 32, 26); },
+  pillar(g, x, y) { const gr = g.createLinearGradient(x, 0, x + 110, 0); gr.addColorStop(0, '#6E8C5F'); gr.addColorStop(1, '#55704A'); g.fillStyle = gr; g.fillRect(x, y, 110, 120); g.fillStyle = '#4A6140'; g.fillRect(x, y, 110, 12); g.strokeStyle = '#3F5436'; g.lineWidth = 2; g.strokeRect(x + 10, y + 20, 42, 92); g.strokeRect(x + 58, y + 20, 42, 92); },
+  rack(g, x, y) { g.fillStyle = '#C7CCD2'; g.fillRect(x, y, 170, 92); g.fillStyle = '#8F969E'; for (let k = 0; k < 9; k++) g.fillRect(x + 10 + k * 17, y + 12, 11, 68); g.fillStyle = '#33B566'; for (let k = 0; k < 9; k++) g.fillRect(x + 12 + k * 17, y + 16, 7, 5); },
+  rmu(g, x, y) { g.fillStyle = '#C8302A'; g.fillRect(x, y, 230, 150); g.fillStyle = '#A82621'; for (let k = 0; k < 4; k++) g.fillRect(x + 8 + k * 56, y + 10, 50, 130); g.fillStyle = '#E8E2D6'; for (let k = 0; k < 4; k++) g.fillRect(x + 18 + k * 56, y + 22, 30, 16); },
+  dis(g, x, y) { g.fillStyle = '#E6E8EB'; rr(g, x, y, 66, 112, 6); g.fill(); g.strokeStyle = '#9DA4AC'; g.lineWidth = 2; g.stroke(); g.fillStyle = '#2C4F9E'; g.fillRect(x + 12, y + 14, 42, 34); g.fillStyle = '#C8302A'; g.fillRect(x + 22, y + 60, 22, 20); },
+  cont(g, x, y) { g.fillStyle = '#D9DDE2'; g.beginPath(); g.moveTo(x, y + 40); g.lineTo(x + 170, y); g.lineTo(x + 250, y + 40); g.lineTo(x + 80, y + 86); g.closePath(); g.fill(); g.fillStyle = '#C2C7CE'; g.beginPath(); g.moveTo(x, y + 40); g.lineTo(x + 80, y + 86); g.lineTo(x + 80, y + 150); g.lineTo(x, y + 104); g.closePath(); g.fill();
+    g.fillStyle = '#B0B6BE'; g.beginPath(); g.moveTo(x + 80, y + 86); g.lineTo(x + 250, y + 40); g.lineTo(x + 250, y + 104); g.lineTo(x + 80, y + 150); g.closePath(); g.fill(); g.strokeStyle = '#9AA1AA'; g.lineWidth = 2; for (let k = 1; k < 9; k++) { g.beginPath(); g.moveTo(x + 80 + k * 19, y + 86 - k * 5.1); g.lineTo(x + 80 + k * 19, y + 150 - k * 5.1); g.stroke(); } },
+  screen(g, x, y) { g.fillStyle = '#2B2F36'; rr(g, x, y, 120, 76, 4); g.fill(); g.fillStyle = '#EEF0F2'; g.fillRect(x + 5, y + 5, 110, 62); g.fillStyle = '#C8302A'; g.fillRect(x + 50, y + 22, 22, 24); },
+  router(g, x, y) { g.fillStyle = '#1F2329'; rr(g, x, y, 84, 60, 8); g.fill(); g.fillStyle = '#3D8BFF'; g.fillRect(x + 10, y + 16, 28, 4); },
+  cloud(g, x, y) { g.fillStyle = '#6FD3E8'; g.beginPath(); g.arc(x + 40, y + 50, 30, 0, 7); g.arc(x + 80, y + 36, 38, 0, 7); g.arc(x + 120, y + 52, 28, 0, 7); g.fill(); g.fillRect(x + 40, y + 50, 80, 30); g.fillStyle = '#fff'; g.font = '700 22px UI'; g.textAlign = 'center'; g.fillText('UIOT', x + 80, y + 62); g.textAlign = 'left'; },
+};
+const PROTO = { iec104: '#1F3FB0', iec62056: '#F29B2A', modbus: '#6E9A3A', mqtt: '#E0322B' };
+function wire(g, col, pts) { g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
+function drawOverview(g, s) {   // s: { ok: number of green badges (0..5), temp: VRDT-1 oil temp, alarm: 0..1 }
+  hmiFrame(g, 'System Overview'); const dx = 0, sc = 1;
+  // wires (protocol colours from the legend)
+  wire(g, PROTO.iec104, [[170, 270], [170, 420], [690, 420]]); wire(g, PROTO.iec104, [[440, 250], [440, 400], [690, 400]]);
+  wire(g, PROTO.iec104, [[1000, 270], [1000, 420], [790, 420]]); wire(g, PROTO.iec62056, [[200, 380], [200, 450], [690, 450]]);
+  wire(g, PROTO.iec62056, [[1080, 380], [1080, 440], [790, 440]]); wire(g, PROTO.modbus, [[220, 520], [220, 475], [690, 475]]);
+  wire(g, PROTO.modbus, [[1050, 520], [1050, 470], [790, 470]]); wire(g, PROTO.modbus, [[560, 600], [560, 500], [690, 500]]);
+  wire(g, PROTO.mqtt, [[740, 520], [740, 640], [880, 640], [880, 690], [1240, 690], [1240, 380], [1290, 380]]);
+  g.setLineDash([8, 6]); wire(g, '#1F3FB0', [[470, 150], [470, 100], [520, 100]]); g.setLineDash([]);
+  g.strokeStyle = '#1F3FB0'; g.setLineDash([6, 5]); g.lineWidth = 3; g.strokeRect(522, 86, 96, 30); g.setLineDash([]); g.fillStyle = '#1F3FB0'; g.font = '700 22px UI'; g.fillText('RCC', 546, 109);
+  g.fillStyle = '#4A4F57'; g.font = '500 13px UI'; [['IEC 60870-5-104', 540, 395], ['IEC 62056-21', 540, 446], ['MODBUS TCP/IP', 540, 471], ['MQTT', 1180, 372]].forEach(([t, x, y]) => g.fillText(t, x, y));
+  // equipment
+  tag(g, 70, 102, 'VRDT-1'); ICON.tx(g, 70, 150); tag(g, 1050, 102, 'VRDT-2'); ICON.tx(g, 1050, 150);
+  tag(g, 360, 128, 'RTU', 96); ICON.rack(g, 350, 168); tag(g, 640, 128, 'MRMU', 110); ICON.rmu(g, 590, 168);
+  tag(g, 80, 302, 'DTM-1'); ICON.meter(g, 160, 312); tag(g, 1060, 302, 'DTM-2'); ICON.meter(g, 1050, 312);
+  tag(g, 60, 472, 'OFP-1'); ICON.pillar(g, 60, 520); tag(g, 1000, 472, 'OFP-2'); ICON.pillar(g, 1000, 520);
+  g.fillStyle = '#1D2128'; g.font = '700 22px UI'; g.fillText('DIS', 718, 372); ICON.dis(g, 706, 384);
+  tag(g, 340, 520, 'CESS', 110); ICON.cont(g, 290, 600); tag(g, 640, 640, 'RAMS', 110); ICON.screen(g, 636, 684); ICON.router(g, 830, 560);
+  ICON.cloud(g, 1290, 330);
+  readout(g, 330, 168, [['Top oil temp', s.temp.toFixed(1) + ' °C'], ['Current', '412 A'], ['Voltage', '11.0 kV']]);
+  readout(g, 1310, 168, [['Top oil temp', '61.8 °C'], ['Current', '388 A'], ['Voltage', '11.0 kV']]);
+  readout(g, 290, 600, [['Voltage', '415 V'], ['Current', '96 A']]); readout(g, 1240, 560, [['Voltage', '415 V'], ['Current', '88 A']]);
+  readout(g, 610, 560, [['State of charge', '78 %']]);
+  // weather + legend
+  g.strokeStyle = '#B7BCC3'; g.setLineDash([6, 6]); g.lineWidth = 2; g.beginPath(); g.moveTo(1230, 100); g.lineTo(1230, 470); g.stroke(); g.strokeRect(1252, 590, 230, 190); g.setLineDash([]);
+  g.fillStyle = '#2B2F36'; g.font = '600 17px UI'; g.fillText('Weather', 1260, 124); g.fillStyle = '#F2B632'; g.beginPath(); g.arc(1300, 180, 26, 0, 7); g.fill(); g.fillStyle = '#C9D3DE'; g.beginPath(); g.arc(1300, 205, 26, 0, 7); g.arc(1335, 196, 30, 0, 7); g.fill();
+  readout(g, 1470, 150, [['Irradiance', '742 W/m²'], ['Temperature', '31 °C']]);
+  g.fillStyle = '#2B2F36'; g.font = '600 16px UI'; g.fillText('Legend', 1270, 618); [['IEC 60870-5-104', PROTO.iec104], ['IEC 62056-21', PROTO.iec62056], ['MODBUS TCP/IP', PROTO.modbus], ['MQTT', PROTO.mqtt]].forEach(([n, c], i) => { g.fillStyle = '#3A3F47'; g.font = '400 14px UI'; g.fillText(n, 1270, 654 + i * 34); g.fillStyle = c; g.fillRect(1400, 648 + i * 34, 66, 4); });
+  // status badges: red X until each link comes up, then green tick
+  [[70, 160], [1170, 160], [180, 322], [1090, 322], [60, 530]].forEach(([x, y], i) => badge(g, x, y, i < s.ok));
+  badge(g, 400, 182, true); badge(g, 790, 388, true);
+  // alarm toast (from the logic: oil temp over limit)
+  if (s.alarm > 0) { const y = lerp(HH + 10, HH - 92, outCubic(s.alarm)); g.globalAlpha = clamp01(s.alarm * 1.6); g.fillStyle = '#FFFFFF'; g.shadowColor = 'rgba(0,0,0,0.25)'; g.shadowBlur = 24; rr(g, 330, y, 840, 70, 10); g.fill(); g.shadowBlur = 0;
+    g.fillStyle = '#E53935'; rr(g, 330, y, 10, 70, [10, 0, 0, 10]); g.fill(); badge(g, 380, y + 35, false); g.fillStyle = '#1D2128'; g.font = '700 22px UI'; g.fillText('Alarm  ·  VRDT-1 top oil temp above limit', 410, y + 32);
+    g.fillStyle = '#5A606A'; g.font = '400 17px UI'; g.fillText('10:02:14  ·  Active  ·  raised by on-site logic', 410, y + 56); g.globalAlpha = 1; }
+}
+function drawSLD(g) {
+  hmiFrame(g, 'Single Line Diagram'); const Y = '#F2CC2E'; g.strokeStyle = Y; g.lineWidth = 7; g.beginPath(); g.moveTo(180, 232); g.lineTo(1290, 232); g.stroke();
+  [180, 550, 920, 1290].forEach((x, i) => { g.strokeStyle = '#1D2128'; g.lineWidth = 2.5; g.strokeRect(x - 70, 112, 140, 32); g.fillStyle = '#1D2128'; g.font = '700 20px UI'; g.textAlign = 'center'; g.fillText('Feeder ' + (i + 1), x, 136);
+    g.font = '400 16px UI'; g.fillText(i < 2 ? 'Substation outgoing' : 'TX' + (i - 1), x, 176); g.textAlign = 'left';
+    g.strokeStyle = Y; g.lineWidth = 7; g.beginPath(); g.moveTo(x, 232); g.lineTo(x, 470); g.stroke(); g.fillStyle = '#EEF0F2'; g.fillRect(x - 22, 280, 44, 44); g.strokeRect(x - 22, 280, 44, 44);
+    g.fillStyle = '#21E05A'; g.fillRect(x - 170, 290, 130, 26); g.fillStyle = '#0B3D1C'; g.font = '700 14px UI'; g.fillText('REMOTE iRCB', x - 160, 308);
+    g.beginPath(); g.moveTo(x, 380); g.lineTo(x + 30, 380); g.stroke(); g.beginPath(); g.moveTo(x + 50, 360); g.lineTo(x + 70, 380); g.lineTo(x + 50, 400); g.lineTo(x + 30, 380); g.closePath(); g.stroke();
+    g.fillStyle = '#3A3F47'; g.font = '400 14px UI'; g.fillText('Disconnector switch', x + 34, 300); g.fillText('Earth switch', x + 34, 430);
+    if (i < 2) { g.fillStyle = Y; g.beginPath(); g.moveTo(x - 22, 470); g.lineTo(x + 22, 470); g.lineTo(x, 504); g.closePath(); g.fill(); }
+    else { g.strokeStyle = '#E0322B'; g.lineWidth = 5; g.beginPath(); g.arc(x, 486, 18, 0, 7); g.stroke(); g.beginPath(); g.arc(x, 516, 18, 0, 7); g.stroke(); g.fillStyle = '#F06A4D'; g.beginPath(); g.moveTo(x - 20, 540); g.lineTo(x + 20, 540); g.lineTo(x, 574); g.closePath(); g.fill(); } });
+  g.strokeStyle = '#7A8088'; g.setLineDash([7, 6]); g.lineWidth = 2; g.strokeRect(40, 620, 420, 150); g.setLineDash([]); g.fillStyle = '#2B2F36'; g.font = '600 16px UI'; g.fillText('Indication / alarm', 62, 652);
+  [['Charger fail', 70, 692], ['AC fail', 70, 734], ['DI circuit fail', 270, 692], ['DO circuit fail', 270, 734]].forEach(([s, x, y]) => { g.fillStyle = '#2BBF5E'; g.beginPath(); g.arc(x + 8, y - 6, 11, 0, 7); g.fill(); g.fillStyle = '#3A3F47'; g.font = '400 16px UI'; g.fillText(s, x + 28, y); });
+}
+function drawAnalytics(g) {
+  hmiFrame(g, 'On-site Analytics'); const card = (x, y, w, h, title) => { g.fillStyle = '#FFFFFF'; rr(g, x, y, w, h, 12); g.fill(); g.fillStyle = '#2B2F36'; g.font = '600 20px UI'; g.fillText(title, x + 24, y + 40); };
+  card(40, 110, 900, 420, 'Transformer top oil temperature · 24 h'); g.strokeStyle = '#E2E5E9'; g.lineWidth = 2; for (let k = 0; k < 5; k++) { g.beginPath(); g.moveTo(80, 200 + k * 70); g.lineTo(900, 200 + k * 70); g.stroke(); }
+  g.strokeStyle = '#E0322B'; g.setLineDash([10, 8]); g.beginPath(); g.moveTo(80, 230); g.lineTo(900, 230); g.stroke(); g.setLineDash([]); g.fillStyle = '#E0322B'; g.font = '500 15px UI'; g.fillText('limit', 850, 222);
+  g.strokeStyle = '#1F3FB0'; g.lineWidth = 4; g.beginPath(); for (let k = 0; k <= 60; k++) { const x = 80 + k * 13.6, y = 420 - 120 * Math.sin(k / 60 * Math.PI) - 18 * Math.sin(k / 3.1) - (k > 52 ? (k - 52) * 9 : 0); k ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+  card(970, 110, 490, 200, 'Feeder load now'); [['F1', 0.72], ['F2', 0.58], ['F3', 0.81], ['F4', 0.44]].forEach(([n, v], i) => { g.fillStyle = '#E8EBEF'; g.fillRect(1040, 168 + i * 32, 380, 18); g.fillStyle = '#3D8BFF'; g.fillRect(1040, 168 + i * 32, 380 * v, 18); g.fillStyle = '#3A3F47'; g.font = '500 15px UI'; g.fillText(n, 1000, 182 + i * 32); });
+  card(970, 330, 490, 200, 'Energy · last 7 days'); [0.6, 0.72, 0.65, 0.8, 0.77, 0.9, 0.84].forEach((v, i) => { g.fillStyle = '#6E9A3A'; g.fillRect(1010 + i * 62, 500 - v * 120, 40, v * 120); });
+  card(40, 560, 440, 210, 'Derived parameter'); g.fillStyle = '#1D2128'; g.font = '700 54px UI'; g.fillText('0.87', 64, 680); g.fillStyle = '#5A606A'; g.font = '400 18px UI'; g.fillText('Loading factor, calculated in ST logic', 64, 730);
+  card(510, 560, 950, 210, 'Events today'); [['10:02:14', 'VRDT-1 top oil temp above limit', '#E53935'], ['09:41:07', 'OFP-2 link restored', '#2BBF5E'], ['08:15:52', 'CESS mode: charging', '#3D8BFF']].forEach(([a, b, c], i) => { g.fillStyle = c; g.beginPath(); g.arc(544, 634 + i * 42, 8, 0, 7); g.fill(); g.fillStyle = '#3A3F47'; g.font = '500 17px Code'; g.fillText(a, 566, 640 + i * 42); g.font = '400 18px UI'; g.fillText(b, 690, 640 + i * 42); });
+}
+
+// ---------------------------------------------------------------- logo (paths read from the vector rebuild)
+const LOGO = {};
+async function loadLogo() {
+  const doc = new DOMParser().parseFromString(await (await fetch('sae-logo-white.svg')).text(), 'image/svg+xml');
+  const d = id => doc.getElementById(id).getAttribute('d');
+  LOGO.S = new Path2D(d('S')); LOGO.A = new Path2D(d('A')); LOGO.E = new Path2D(d('E'));
+  LOGO.clip = { S: new Path2D(doc.querySelector('#cs path').getAttribute('d')), A: new Path2D(doc.querySelector('#ca path').getAttribute('d')), E: new Path2D(doc.querySelector('#ce path').getAttribute('d')) };
+  LOGO.stripes = [...doc.querySelectorAll('#S-stripes rect')].map(r => [+r.getAttribute('y'), +r.getAttribute('height')]);
+  LOGO.letters = [...doc.querySelectorAll('svg > g:last-child > path')].map(p => new Path2D(p.getAttribute('d')));
+  LOGO.iso = new Image(); LOGO.iso.src = 'iso9001-bsi.jpg'; await LOGO.iso.decode().catch(() => {});
+}
+// logo placement on screen (visual bbox 20..450.5 x 15..205.6 in logo units, centred)
+const LG = { s: 1.72, cx: 235.25, cy: 110.3, X: 960, Y: 455 };
+const lx = x => LG.X + (x - LG.cx) * LG.s, ly = y => LG.Y + (y - LG.cy) * LG.s;
+const STRIPE_X0 = lx(24), STRIPE_X1 = lx(450.5);
+
+// ---------------------------------------------------------------- build textures
+function build() {
+  T.netW = tex(NET.x1 - NET.x0, NET.y1 - NET.y0, g => drawNet(g, '#FFFFFF')).redraw();
+  T.netB = tex(NET.x1 - NET.x0, NET.y1 - NET.y0, g => drawNet(g, '#2F7BEF')).redraw();
+  T.assets = ASSETS.map((a, i) => tex(220, 220, g => drawAsset(g, i)).redraw());
+  T.glow = tex(80, 80, g => drawGlow(g, 'rgba(150,200,255,1)')).redraw(); T.glowG = tex(80, 80, g => drawGlow(g, 'rgba(90,240,160,1)')).redraw();
+  T.white = solid('#FFFFFF').redraw(); T.side = solid('#A9ADA5').redraw(); T.top = solid('#C3C7BF').redraw(); T.inner = solid('#0A1424').redraw();
+  T.chips = CHIPS.map(s => { const w = 34 + s.length * 14; return tex(w, 56, g => drawChip(g, s, w)).redraw(); });
+  T.dis = tex(DIS.w, DIS.h, drawDIS).redraw();
+  T.blocks = BLK.names.map((_, i) => tex(BLK.w, BLK.h, (g, lit) => drawBlock(g, i, lit)));
+  T.link = solid('#2F7BEF').redraw(); T.code = tex(760, 44, drawCode);
+  T.hmi = tex(HW, HH, (g, ok, temp, al) => drawOverview(g, { ok, temp, alarm: al }));
+  T.sld = tex(HW, HH, drawSLD).redraw(); T.ana = tex(HW, HH, drawAnalytics).redraw();
+  T.grid = tex(2048, 2048, g => { g.strokeStyle = 'rgba(120,165,235,1)'; g.lineWidth = 3.5; for (let k = 0; k <= 2048; k += 32) { g.beginPath(); g.moveTo(k, 0); g.lineTo(k, 2048); g.stroke(); g.beginPath(); g.moveTo(0, k); g.lineTo(2048, k); g.stroke(); } }).redraw();
+  T.uplink = tex(12, 600, g => { g.fillStyle = '#5C9BFF'; for (let y = 0; y < 600; y += 26) g.fillRect(2, y, 8, 15); }).redraw();
+  T.scada = tex(380, 60, g => drawChip(g, 'SCADA · control centre', 380)).redraw();
+}
+
+// ---------------------------------------------------------------- the 3D scene
+const DIS_POS = [0, 0, 0];
+function hmiState(t) { const ok = Math.min(5, Math.floor(Math.max(0, t - BEAT.badges[0]) / 0.3 + (t >= BEAT.badges[0] ? 1 : 0)));
+  const temp = 62 + 30 * sine(prog(t, 16.6, 18.4)); const al = Math.round(prog(t, BEAT.alarm, BEAT.alarm + 0.5) * 20) / 20; return [ok, Math.round(temp * 10) / 10, al]; }
+function hmiGeom(t) {   // the HMI grows out of the "Act & display" block
+  const k = inOutCubic(prog(t, BEAT.grow[0], BEAT.grow[1])), sc = lerp(BLK.w / HW, 1, k);
+  return { k, sc, pos: [lerp(BLK.xs[3], HMI_X, k), lerp(0, 0, k), HMI_Z + 2] };
+}
+const SIDE = [{ tex: 'sld', x: HMI_X - 1520, ry: 0.32 }, { tex: 'ana', x: HMI_X + 1520, ry: -0.32 }];
+function scene(t, cam) {
+  const P = [], eyeZ = cam.eye[2];
+  // floor grid
+  const gridA = 0.075 * sine(prog(t, 1.0, 3.0)) * (1 - prog(t, BEAT.squash[0], BEAT.squash[0] + 0.6));
+  P.push({ tex: T.grid.tex, w: 14000, h: 14000, pos: [0, -560, -2500], rot: [-Math.PI / 2, 0, 0], alpha: gridA, bias: -1e6, reflect: false });
+  // field network (gone once we are inside the box)
+  const outside = 1 - prog(t, BEAT.enter, BEAT.enter + 0.4);
+  if (outside > 0) {
+    const nx = (NET.x0 + NET.x1) / 2, ny = (NET.y0 + NET.y1) / 2, nw = NET.x1 - NET.x0, nh = NET.y1 - NET.y0;
+    const stripeA = 1 - sine(prog(t, BEAT.fadeStripes[0], BEAT.fadeStripes[1]));
+    P.push({ tex: T.netB.tex, w: nw, h: nh, pos: [nx, ny, 0], alpha: outside * prog(t, BEAT.sweep[1] - 0.3, BEAT.sweep[1] + 0.3), bias: 0 });
+    // shot 1: the four logo stripes are the bus section of the lines, seen up close; they sweep in from the edges
+    if (stripeA > 0) BUS.forEach((y, i) => { const k = outExpo(prog(t, BEAT.sweep[0] + i * 0.09, BEAT.sweep[0] + i * 0.09 + 1.1)), len = 700 * k, fromL = i % 2 === 0;
+      const x = fromL ? -1750 + len / 2 : -1050 - len / 2; P.push({ tex: T.white.tex, w: len, h: 11, pos: [x, y, 0.5], alpha: stripeA, bias: 5 }); });
+    T.assets.forEach((a, i) => P.push({ tex: a.tex, w: 220, h: 220, pos: [-2230, ASSETS[i].y - 20, 6], alpha: outside * sine(prog(t, 1.6 + i * 0.12, 2.6 + i * 0.12)), bias: 10 }));
+    // pulses of light from each asset to the DIS
+    if (t > BEAT.pulses) LINES.forEach((ln, i) => { for (let j = 0; j < 2; j++) { const u = ((t - BEAT.pulses) * 0.34 + i * 0.23 + j * 0.5) % 1, [x, y] = along(ln, u);
+      P.push({ tex: T.glow.tex, w: 70, h: 70, pos: [x, y, 2], alpha: outside * prog(t, BEAT.pulses, BEAT.pulses + 0.6) * Math.min(1, u * 8, (1 - u) * 8), bias: 20 }); } });
+    // protocol tags ride the lines into the DIS
+    T.chips.forEach((c, i) => { const k = prog(t, BEAT.chips[0] + i * 0.6, BEAT.chips[0] + i * 0.6 + 2.4), u = lerp(0.12, 0.93, sine(k)), [x, y] = along(LINES[i], u);
+      const a = Math.min(sine(k * 5), 1 - prog(k, 0.82, 1)); if (a > 0) P.push({ tex: c.tex, w: c.w * 1.7, h: c.h * 1.7, pos: [x, y + (i < 2 ? 56 : -56), 12], alpha: a, bias: 420 }); });
+    // DIS enclosure (front, sides, top, a dark interior behind the window)
+    const disA = clamp01((eyeZ - 40) / 260);
+    if (disA > 0) {
+      P.push({ tex: T.dis.tex, w: DIS.w, h: DIS.h, pos: DIS_POS, alpha: disA, bias: 30 });
+      P.push({ tex: T.side.tex, w: DIS.d, h: DIS.h, pos: [-DIS.w / 2, 0, -DIS.d / 2], rot: [0, Math.PI / 2, 0], alpha: disA, light: 0.75 });
+      P.push({ tex: T.side.tex, w: DIS.d, h: DIS.h, pos: [DIS.w / 2, 0, -DIS.d / 2], rot: [0, Math.PI / 2, 0], alpha: disA, light: 0.6 });
+      P.push({ tex: T.top.tex, w: DIS.w, h: DIS.d, pos: [0, DIS.h / 2, -DIS.d / 2], rot: [-Math.PI / 2, 0, 0], alpha: disA });
+    }
+  }
+  // inside: the logic chain (only seen through the window, then all around us)
+  const inside = (t < BEAT.enter ? sine(prog(eyeZ, 900, 120)) * prog(t, 9.0, 9.6) : 1) * (1 - prog(t, BEAT.squash[0], BEAT.squash[0] + 0.3));
+  const hg = hmiGeom(t), chainA = inside * (1 - sine(prog(t, BEAT.grow[0] + 0.3, BEAT.grow[1])));
+  if (chainA > 0) {
+    BLK.xs.forEach((x, i) => { const lit = Math.round(10 * sine(prog(t, BEAT.blocks[i], BEAT.blocks[i] + 0.35))) / 10;
+      if (i === 3) return; T.blocks[i].redraw(lit); P.push({ tex: T.blocks[i].tex, w: BLK.w, h: BLK.h, pos: [x, 0, HMI_Z], alpha: chainA, bias: 40 }); });
+    for (let i = 0; i < 3; i++) P.push({ tex: T.link.tex, w: 100, h: 6, pos: [BLK.xs[i] + 200, 0, HMI_Z - 1], alpha: chainA * 0.9 });
+    const sp = prog(t, BEAT.blocks[0] - 0.2, BEAT.blocks[3]); if (sp > 0 && sp < 1) P.push({ tex: T.glow.tex, w: 90, h: 90, pos: [lerp(-750, 600, sp), 0, HMI_Z + 4], alpha: chainA * Math.min(1, (1 - sp) * 6), bias: 60 });
+    T.code.redraw(Math.round(CODE.length * prog(t, BEAT.code[0], BEAT.code[1])));
+    P.push({ tex: T.code.tex, w: 760, h: 44, pos: [-370 + 380, -175, HMI_Z], alpha: chainA, bias: 40 });
+  }
+  // "Act & display" block -> HMI
+  if (inside > 0) {
+    const [ok, temp, al] = hmiState(t); T.hmi.redraw(ok, temp, al); const lit = Math.round(10 * sine(prog(t, BEAT.blocks[3], BEAT.blocks[3] + 0.35))) / 10; T.blocks[3].redraw(lit);
+    const sq = squashK(t);
+    if (sq <= 0) {
+      P.push({ tex: T.hmi.tex, w: HW, h: HH, pos: hg.pos, scale: hg.sc, alpha: inside * sine(prog(hg.k, 0.05, 0.55)), bias: 300 });
+      P.push({ tex: T.blocks[3].tex, w: HW, h: HH, pos: [hg.pos[0], hg.pos[1], hg.pos[2] + 1], scale: hg.sc, alpha: inside * (1 - sine(prog(hg.k, 0.1, 0.6))), bias: 310 });
+      // shot 6: the other two screens and the uplink
+      const side = sine(prog(t, 19.9, 21.0));
+      SIDE.forEach(s => { if (side > 0) P.push({ tex: T[s.tex].tex, w: HW, h: HH, pos: [s.x, 0, HMI_Z + 260], rot: [0, s.ry, 0], scale: 0.86, alpha: side, bias: 200 }); });
+    }
+  }
+  if (inside > 0 && t > 20) {
+    const up = sine(prog(t, 20.3, 21.4)), upA = 1 - sine(prog(t, BEAT.squash[0], BEAT.squash[0] + 0.5)); if (up > 0) { P.push({ tex: T.uplink.tex, w: 12, h: 600 * up, pos: [HMI_X, HH / 2 + 30 + 300 * up, HMI_Z], alpha: upA, bias: 250 });
+        P.push({ tex: T.scada.tex, w: 760, h: 120, pos: [HMI_X, HH / 2 + 700, HMI_Z], alpha: upA * sine(prog(t, 21.0, 21.6)), bias: 260 });
+        const u = ((t - 20.6) * 0.6) % 1; if (t > 20.6) P.push({ tex: T.glow.tex, w: 70, h: 70, pos: [HMI_X, HH / 2 + 40 + 600 * u, HMI_Z + 3], alpha: upA * Math.min(1, (1 - u) * 5, u * 8), bias: 270 }); }
+  }
+  return P;
+}
+
+// ---------------------------------------------------------------- 3D -> 2D handover (screens collapse into the four stripes)
+const squashK = t => inOutCubic(prog(t, BEAT.squash[0], BEAT.squash[1]));
+const STRIPE_Y7 = [0, 13.4, 26.8, 40.2].map(o => 760 + o * LG.s), STRIPE_H = 6.6 * LG.s;   // shot 7 stripe rows (screen px), logo proportions
+function corner(p, lxp, lyp) {   // local panel corner -> world (Ry*Rx*Rz order, as gl3d.js)
+  const s = p.scale ?? 1, [rx, ry, rz] = p.rot || [0, 0, 0]; let x = lxp * s, y = lyp * s, z = 0;
+  [x, y] = [Math.cos(rz) * x - Math.sin(rz) * y, Math.sin(rz) * x + Math.cos(rz) * y];
+  [y, z] = [Math.cos(rx) * y - Math.sin(rx) * z, Math.sin(rx) * y + Math.cos(rx) * z];
+  [x, z] = [Math.cos(ry) * x + Math.sin(ry) * z, -Math.sin(ry) * x + Math.cos(ry) * z];
+  return [x + p.pos[0], y + p.pos[1], z + p.pos[2]];
+}
+function quadOf(p, cam, v0 = 0, v1 = 1) {   // screen corners TL, TR, BL for the panel's rows v0..v1
+  const pr = (lxp, lyp) => S3.project(corner(p, lxp, lyp), cam).map(v => v / SCALE);
+  const y0 = p.h / 2 - v0 * p.h, y1 = p.h / 2 - v1 * p.h; return [pr(-p.w / 2, y0), pr(p.w / 2, y0), pr(-p.w / 2, y1)];
+}
+function drawSquash(g, t) {
+  const k = squashK(t); if (k <= 0 || t > BEAT.squash[1]) return false;
+  const cam = camera(Math.min(t, BEAT.squash[1]));
+  const src = [{ p: { tex: T.sld, w: HW, h: HH, pos: [SIDE[0].x, 0, HMI_Z + 260], rot: [0, SIDE[0].ry, 0], scale: 0.86 }, v: [0, 1] },
+               { p: { tex: T.hmi, w: HW, h: HH, pos: [HMI_X, 0, HMI_Z + 2] }, v: [0, 0.5] }, { p: { tex: T.hmi, w: HW, h: HH, pos: [HMI_X, 0, HMI_Z + 2] }, v: [0.5, 1] },
+               { p: { tex: T.ana, w: HW, h: HH, pos: [SIDE[1].x, 0, HMI_Z + 260], rot: [0, SIDE[1].ry, 0], scale: 0.86 }, v: [0, 1] }];
+  src.forEach(({ p, v }, i) => {
+    const ki = inOutCubic(prog(k, i * 0.06, 0.82 + i * 0.06)); const Q = quadOf(p, cam, v[0], v[1]);
+    const y = STRIPE_Y7[i] + stripeRise(t), R = [[STRIPE_X0, y], [STRIPE_X1, y], [STRIPE_X0, y + STRIPE_H]];
+    const [a, b, c] = Q.map((q, j) => [lerp(q[0], R[j][0], ki), lerp(q[1], R[j][1], ki)]);
+    const cw = p.tex.c.width, ch = p.tex.c.height * (v[1] - v[0]);
+    if (ki < 1) { g.save(); g.transform((b[0] - a[0]) / cw, (b[1] - a[1]) / cw, (c[0] - a[0]) / ch, (c[1] - a[1]) / ch, a[0], a[1]); g.globalAlpha = 1 - sine(prog(ki, 0.25, 0.75));
+      g.drawImage(p.tex.c, 0, p.tex.c.height * v[0], cw, ch, 0, 0, cw, ch); g.restore(); }
+    g.save(); g.globalAlpha = sine(prog(ki, 0.2, 0.7)); g.fillStyle = '#FFFFFF'; g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.lineTo(b[0] + c[0] - a[0], b[1] + c[1] - a[1]); g.lineTo(c[0], c[1]); g.closePath(); g.fill(); g.restore();
+  });
+  return true;
+}
+const stripeRise = t => (ly(LOGO.stripes ? LOGO.stripes[0][0] : 112.8) - STRIPE_Y7[0]) * inOutCubic(prog(t, BEAT.rise[0], BEAT.rise[1]));
+
+// ---------------------------------------------------------------- text: word by word, blur to sharp with a small rise
+function line(g, text, t, t0, t1, y, size = 60) {
+  if (t < t0 - 0.01 || t > t1 + 0.8) return; g.save(); g.font = `600 ${size}px UI`; g.letterSpacing = `${-size * 0.03}px`; g.textBaseline = 'alphabetic';
+  const words = text.split(' '), sp = g.measureText(' ').width, ws = words.map(w => g.measureText(w).width), total = ws.reduce((a, b) => a + b, 0) + sp * (words.length - 1);
+  let x = W / 2 - total / 2;
+  words.forEach((w, i) => {
+    const kin = sine(prog(t, t0 + i * 0.08, t0 + i * 0.08 + 0.55)), kout = sine(prog(t, t1 + i * 0.05, t1 + i * 0.05 + 0.45)), a = kin * (1 - kout);
+    if (a > 0.003) { g.globalAlpha = a; g.filter = `blur(${((1 - kin) * 10 + kout * 8) * SCALE}px)`;
+      const yy = y + (1 - kin) * 16 - kout * 12, gr = g.createLinearGradient(0, yy - size * 0.72, 0, yy); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(0.5, '#FFFFFF'); gr.addColorStop(1, '#AEB9CB');
+      g.fillStyle = gr; g.fillText(w, x, yy); }
+    x += ws[i] + sp;
+  });
+  g.restore();
+}
+
+// ---------------------------------------------------------------- shots 7-8 (2D): stripes, promise, logo build
+function drawEnd(g, t) {
+  if (t < BEAT.squash[1] - 0.05) return;
+  // stripes (after the handover they are plain rectangles; then the S|A|E gaps open)
+  const cut = sine(prog(t, BEAT.cut[0], BEAT.cut[1]));
+  g.save(); g.translate(LG.X, LG.Y); g.scale(LG.s, LG.s); g.translate(-LG.cx, -LG.cy);
+  const dy = (STRIPE_Y7[0] + stripeRise(t) - ly(LOGO.stripes[0][0])) / LG.s;
+  g.fillStyle = '#FFFFFF';
+  if (t > BEAT.squash[1]) LOGO.stripes.forEach(([y, h], i) => {
+    const yy = y + dy;
+    g.globalAlpha = 1 - cut; g.fillRect(24, yy, 426.5, h);
+    g.globalAlpha = cut; for (const c of ['S', 'A', 'E']) { g.save(); g.clip(LOGO.clip[c]); g.fillRect(0, yy, 480, h); g.restore(); }
+  });
+  g.globalAlpha = 1;
+  // S, A, E rise out of the stripes (clipped above the first stripe)
+  ['S', 'A', 'E'].forEach((c, i) => { const k = outExpo(prog(t, BEAT.build[0] + i * 0.1, BEAT.build[0] + i * 0.1 + 0.8)); if (k <= 0) return;
+    g.save(); g.beginPath(); g.rect(0, 0, 480, 108.6); g.clip(); g.translate(0, (1 - k) * 100); g.fill(LOGO[c]); g.restore(); });
+  // MALAYSIA, letter by letter
+  LOGO.letters.forEach((p, i) => { const k = sine(prog(t, BEAT.word[0] + i * 0.05, BEAT.word[0] + i * 0.05 + 0.45)); if (k <= 0) return;
+    g.save(); g.globalAlpha = k; g.filter = `blur(${(1 - k) * 6 * SCALE}px)`; g.translate(0, (1 - k) * 8); g.fill(p); g.restore(); });
+  // light sweep across the logo
+  const ls = prog(t, BEAT.sweepLight[0], BEAT.sweepLight[1]);
+  if (ls > 0 && ls < 1) { g.save(); const all = new Path2D(); ['S', 'A', 'E'].forEach(c => all.addPath(LOGO[c])); LOGO.letters.forEach(p => all.addPath(p)); g.clip(all);
+    const x = lerp(-60, 540, ls), gr = g.createLinearGradient(x - 60, 0, x + 60, 0); gr.addColorStop(0, 'rgba(120,180,255,0)'); gr.addColorStop(0.5, 'rgba(120,180,255,0.85)'); gr.addColorStop(1, 'rgba(120,180,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 480, 240); g.restore(); }
+  g.restore();
+  // URL + CTA, low and centred; ISO mark small, bottom right
+  const c = sine(prog(t, BEAT.cta[0], BEAT.cta[1])), c2 = sine(prog(t, BEAT.cta[0] + 0.15, BEAT.cta[1] + 0.15));
+  if (c > 0) { g.save(); g.textAlign = 'center'; g.globalAlpha = c; g.filter = `blur(${(1 - c) * 8 * SCALE}px)`; g.fillStyle = '#FFFFFF'; g.font = '600 44px UI'; g.letterSpacing = '-1px'; g.fillText('sae-malaysia.com', W / 2, 818 + (1 - c) * 12);
+    g.globalAlpha = c2; g.filter = `blur(${(1 - c2) * 8 * SCALE}px)`; g.fillStyle = '#A9BBD6'; g.font = '400 28px UI'; g.letterSpacing = '0px'; g.fillText('Talk to us about your DIS application.', W / 2, 868 + (1 - c2) * 12); g.restore(); }
+  const iso = sine(prog(t, BEAT.cta[0] + 0.3, BEAT.cta[1] + 0.3));
+  if (iso > 0 && LOGO.iso.naturalWidth) { g.save(); g.globalAlpha = iso * 0.92; const w = 190, h = w * LOGO.iso.naturalHeight / LOGO.iso.naturalWidth; rr(g, W - 64 - w, H - 56 - h, w, h, 6); g.clip(); g.drawImage(LOGO.iso, W - 64 - w, H - 56 - h, w, h); g.restore(); }
+}
+
+// ---------------------------------------------------------------- frame
+function background(g, t) {
+  const toDeep = sine(prog(t, 1.2, 3.0)), toNavy = squashK(t), col = mixC(mixC(C.navy, C.deep, toDeep).match(/\d+/g).map(Number), C.navy, toNavy);
+  g.fillStyle = col; g.fillRect(0, 0, W, H);
+  const glow = (1 - toNavy) * toDeep, r = g.createRadialGradient(W / 2, H * 0.47, 0, W / 2, H * 0.47, W * 0.62); r.addColorStop(0, `rgba(30,70,130,${0.45 * glow})`); r.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = r; g.fillRect(0, 0, W, H);
+}
+function vignette(g) { const r = g.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, W * 0.75); r.addColorStop(0, 'rgba(0,0,0,0)'); r.addColorStop(1, 'rgba(0,0,0,0.35)'); g.fillStyle = r; g.fillRect(0, 0, W, H); }
+function frame(g, t) {
+  g.setTransform(SCALE, 0, 0, SCALE, 0, 0); g.globalAlpha = 1; g.filter = 'none'; background(g, t);
+  if (t < BEAT.squash[1] + 0.05) { const cam = camera(t); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(S3.render(scene(t, cam), cam), 0, 0); g.setTransform(SCALE, 0, 0, SCALE, 0, 0); }
+  drawSquash(g, t); drawEnd(g, t);
+  line(g, 'Connect the assets that matter.', t, BEAT.l1[0], BEAT.l1[1], 128);
+  line(g, 'Speak the language of your assets.', t, BEAT.l2[0], BEAT.l2[1], 128);
+  line(g, 'From field signals to on-site decisions.', t, BEAT.l3[0], BEAT.l3[1], 150);
+  line(g, 'See the result at the site.', t, BEAT.l4[0], BEAT.l4[1], 96, 54);
+  line(g, 'Process locally. Operate intelligently.', t, BEAT.l5[0], BEAT.l5[1], 1000, 54);
+  line(g, 'Connect the field.', t, BEAT.promise[0], BEAT.promise[1], 380, 68);
+  line(g, 'Process at the edge.', t, BEAT.promise[0] + 0.55, BEAT.promise[1] + 0.1, 480, 68);
+  line(g, 'See the result.', t, BEAT.promise[0] + 1.1, BEAT.promise[1] + 0.2, 580, 68);
+  vignette(g);
+}
+const SUB = +(q.get('sub') || 12), SHUTTER = 0.5 / 25;   // motion blur: sub-frames over a 180-degree shutter at 25 fps
+let built = false;
+function render(t) {
+  if (!built) { build(); built = true; }
+  const still = t >= 29.0;   // the end card holds perfectly still: no blur needed
+  const n = still ? 1 : SUB, A = ACC.getContext('2d'); A.setTransform(1, 0, 0, 1, 0, 0); A.globalAlpha = 1; A.clearRect(0, 0, ACC.width, ACC.height);
+  for (let i = 0; i < n; i++) { const ts = n === 1 ? t : Math.max(0, Math.min(END, t + (i / (n - 1) - 0.5) * SHUTTER)); const g = TMP.getContext('2d'); frame(g, ts);
+    A.globalAlpha = 1 / (i + 1); A.drawImage(TMP, 0, 0); }
+  MAIN.setTransform(1, 0, 0, 1, 0, 0); MAIN.globalAlpha = 1; MAIN.drawImage(ACC, 0, 0);
+}
+window.TOTAL = END; window.renderAt = t => render(t);
+window.ready = Promise.all([document.fonts.load('600 60px UI'), document.fonts.load('400 20px UI'), document.fonts.load('700 20px UI'), document.fonts.load('500 20px Code'), loadLogo()]).catch(e => console.error(e))
+  .then(() => { if (q.has('t')) render(parseFloat(q.get('t'))); else (function tick(n) { render((n / 1000) % END); requestAnimationFrame(tick); })(0); return true; });
+</script></body></html>
